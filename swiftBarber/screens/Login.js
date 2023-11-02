@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import { View, Text, StyleSheet,TextInput, } from 'react-native';
+import { View, Text, StyleSheet,TextInput,TouchableOpacity } from 'react-native';
 import { Svg, Path, Line, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { signInWithEmailAndPassword, sendPasswordResetEmail,onAuthStateChanged } from "firebase/auth";
 import { auth, googleAuthProvider } from "../Firebase/index.js";
@@ -116,12 +116,14 @@ export default function Login({navigation}) {
             						</View>
           					</View>
           					{/* RN-Flow:: can be replaced with <StyleTextThemeDarkStateUncheckedComponentCheckbox style={"text"} theme={"dark"} state={"unchecked"} component={"checkbox"} /> */}
-          					<View style={styles.styleTextThemeDarkStateUncheckedComponentCheckbox}>
-            						<View style={styles.rectangle}/>
-            						<Text style={styles.unchecked}>
-              							{`Remember me`}
-            						</Text>
-          					</View>
+                  
+                  <TouchableOpacity onPress={()=> navigation.navigate('loginBarber')}>
+                
+              <Text style={styles.forgotthepassword}>
+                             {`If you are a barber login from here`}
+              </Text>
+      </TouchableOpacity>
+    
           					{/* RN-Flow:: can be replaced with <TypeButtonType2SecondaryType3RoundedStyleDefaultStateDisabledThemeDarkComponentButton type={"button"} type2={"secondary"} type3={"rounded"} style={"default"} state={"disabled"} theme={"dark"} component={"button"} /> */}
           					<View style={styles.typeButtonType2SecondaryType3RoundedStyleDefaultStateDisabledThemeDarkComponentButton}>
             						<Text style={styles.LOGIN} onPress={()=>signIn()}>

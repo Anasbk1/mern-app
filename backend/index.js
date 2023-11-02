@@ -11,11 +11,13 @@ app.use(cors());
 
 app.use(express.json())
 // Logging for development (you can customize this)
-const routes = require('./routes/user.js'); // Assuming you have a separate file for your routes
+const routes = require('./routes/user.js'); 
+const barberRoutes = require('./routes/barber.js');
+
 
 // Routes
 app.use('/users', routes); // Mount your routes at the /api path
-
+app.use('/barbers', barberRoutes);
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

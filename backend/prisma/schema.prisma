@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("mysql://root:123456@localhost:3306/booking")
+  url = env("DATABASE_URL")
 }
 
 model User {
@@ -20,9 +20,13 @@ model User {
 model Barber {
   id          Int      @id @default(autoincrement())
   name        String
-  email       String
-  description String
-  location    String
+  email       String  
+  description String ?
+  location    String ?
+  phoneNumber String ?
+  image       String ? 
+  service     String ?
+  pricing     Int    ? 
   posts       Post[]
   reviews     Review[]
 }

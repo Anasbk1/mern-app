@@ -11,6 +11,10 @@ import Saved from './screens/Saved.js';
 import RemoveSaved from './screens/RemoveSaved.js';
 import { MyProvider } from './useContext/useContext.js';
 import UpdateUser from './screens/UpdateUser.jsx'
+import loginBarber from './screens/barber/LogIn.js'
+import SignInBarber from './screens/barber/SignIn.js'
+import BarberProfile from './screens/barber/BarberProfile.js'
+import EditProfile from './screens/barber/EditProfile.js'
 
 const Stack = createStackNavigator()
 
@@ -30,6 +34,11 @@ export default function App() {
       <Stack.Screen name ="RemoveSaved" component={RemoveSaved}/>
       <Stack.Screen name = "BarberDetail" component={BarberDetail}/>
       <Stack.Screen name = "UpdateUser" component ={UpdateUser}/>
+      <Stack.Screen name = "loginBarber" component={loginBarber}/>
+      <Stack.Screen name = 'SignInBarber' component={SignInBarber} />
+      <Stack.Screen name = 'BarberProfile' component={BarberProfile} />
+      <Stack.Screen name = 'EditProfile' component={EditProfile} />
+
     </Stack.Navigator>
   </NavigationContainer>
   </MyProvider>
