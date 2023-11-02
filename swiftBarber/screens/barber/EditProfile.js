@@ -1,5 +1,5 @@
 import React,{useState,useEffect,useContext} from 'react';
-import { View, Text, ImageBackground, StyleSheet,ScrollView ,TouchableOpacity} from 'react-native';
+import { View, Text, ImageBackground, StyleSheet,ScrollView ,TouchableOpacity,TextInput} from 'react-native';
 import { Svg, Path, Defs, LinearGradient, Stop, Circle, Pattern, Use, Image } from 'react-native-svg';
 import axios from 'axios';
 import ADDRESS_IP from '../API.js';
@@ -9,18 +9,59 @@ import { MyContext } from '../../useContext/useContext.js';
 export default function _Dark_detailspackagedetails() {
     const context = useContext(MyContext);
     const BarberName=context.barberName
-   
-    const [newName,setNewName] =useState('');
+
+   const [editing , setEditing] = useState(false)
+
+    const [newName,setNewName] =useState(BarberName);
   const [email, setEmail] = useState('');
   const [image, setImage] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [description, setDescription] = useState(''); // Add description state
+  const [description, setDescription] = useState('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip'); // Add description state
+  const [editingDescription, setEditingDescription] = useState(false);
   const [location, setLocation] = useState(''); // Add location state
   const [phoneNumber, setPhoneNumber] = useState(''); // Add phoneNumber state
   const [service, setService] = useState(''); // Add service state
   const [pricing, setPricing] = useState(0);
   const [idBarber, setIdBarber] = useState(null);
   const [modal, setModal] = useState(false);
+
+  const handleEditPress = () => {
+    if (editing) {
+      // If editing is true, save the changes
+      setEditing(false); // Set editing back to false
+      // Perform any necessary actions with the updated barberName
+    } else {
+      // If editing is false, switch to edit mode
+      setEditing(true);
+    }
+  };
+
+  const handleSavePress = () => {
+    setEditing(false);
+    // Perform any necessary actions with the updated barberName
+  };
+
+  const handleChangeText = (text) => {
+    setNewName(text);
+  };
+//////////////////// description /////////////////////////////
+const handleEditDescriptionPress = () => {
+    if (editingDescription) {
+      // If editingDescription is true, save the changes
+      setEditingDescription(false); // Set editingDescription back to false
+      // Perform any necessary actions with the updated description
+    } else {
+      // If editingDescription is false, switch to edit mode
+      setEditingDescription(true);
+    }
+  };
+
+  const handleChangeDescriptionText = (text) => {
+    setDescription(text); // Update description with the modified text
+  };
+  /////////////////////////////////////////////////////
+
+
 
   const uploadImageToCloudinary = async (imageUri) => {
     try {
@@ -381,26 +422,53 @@ export default function _Dark_detailspackagedetails() {
 {`Services & Pricing`}
 </Text>
 </View>
-{/* RN-Flow:: can be replaced with <_iconlyBoldEditSquare description edit /> */}
+{/* {/description edit /> /} */}
+<View >
+<TouchableOpacity onPress={handleEditDescriptionPress}>
 <View style={styles._iconlyBoldEditSquare}>
 <Svg style={styles.___________group} width="20" height="20" viewBox="0 0 20 20" fill="none" >
 <Path fillRule="evenodd" clipRule="evenodd" d="M14.2764 0.842802C15.5951 0.760387 16.8954 1.21825 17.8752 2.11565C18.7727 3.09547 19.2305 4.39579 19.1573 5.72359V14.2764C19.2397 15.6042 18.7727 16.9045 17.8844 17.8843C16.9046 18.7817 15.5951 19.2396 14.2764 19.1572H5.72355C4.39575 19.2396 3.09541 18.7817 2.11559 17.8843C1.21817 16.9045 0.760311 15.6042 0.842726 14.2764V5.72359C0.760311 4.39579 1.21817 3.09547 2.11559 2.11565C3.09541 1.21825 4.39575 0.760387 5.72355 0.842802H14.2764ZM9.06595 14.4412L15.2288 8.26013C15.7874 7.69238 15.7874 6.77666 15.2288 6.21807L14.0383 5.02764C13.4706 4.45989 12.5549 4.45989 11.9871 5.02764L11.3736 5.65033C11.282 5.7419 11.282 5.89757 11.3736 5.98914C11.3736 5.98914 12.8296 7.43598 12.8571 7.47261C12.9578 7.5825 13.0219 7.72901 13.0219 7.89384C13.0219 8.2235 12.7563 8.49821 12.4175 8.49821C12.2618 8.49821 12.1153 8.43411 12.0146 8.33339L10.4853 6.81329C10.4121 6.74003 10.2839 6.74003 10.2106 6.81329L5.84259 11.1813C5.5404 11.4835 5.36642 11.8864 5.35726 12.3168L5.30231 14.487C5.30231 14.6061 5.33894 14.7159 5.42136 14.7984C5.50377 14.8808 5.61366 14.9266 5.73271 14.9266H7.88466C8.32421 14.9266 8.74545 14.7526 9.06595 14.4412Z" fill="#FB9400"/>
 </Svg>
 </View>
+</TouchableOpacity>
+{editingDescription ? (
+        <TextInput
+          value={description}
+          onChangeText={handleChangeDescriptionText}
+          onBlur={handleEditDescriptionPress}
+          autoFocus={true}
+          style={styles.loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliquaUtenimadminimveniamquisnostrudexercitationullamcolaborisnisiutaliquipReadmore}
+        />
+      ) : (
 <Text style={styles.loremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliquaUtenimadminimveniamquisnostrudexercitationullamcolaborisnisiutaliquipReadmore}>
-{`Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip. `}<Text style={{"fontFamily":"Urbanist","fontSize":14,"fontWeight":"700","textAlign":"left","letterSpacing":0.20000000298023224,"lineHeight":19.59999966621399,"color":"rgba(251, 148, 0, 1)"}}>{`Read more...`}</Text>
+{description}
+
 </Text>
+      )}
+</View>
 <View style={styles._______autoLayoutVertical}>
-<Text style={styles.barbarellasalon}>
-{BarberName}
-</Text>
+  {editing ? (
+    <TextInput
+      value={newName}
+      onChangeText={handleChangeText}
+      onBlur={handleSavePress}
+      autoFocus={true}
+      style={styles.barbarellasalon}
+    />
+  ) : (
+    <Text style={styles.barbarellasalon}>{newName}</Text>
+  )}
 </View>
-{/* RN-Flow:: can be replaced with <__iconlyBoldEditSquare  name edit/> */}
-<View style={styles.__iconlyBoldEditSquare}>
-<Svg style={styles.____________group} width="20" height="20" viewBox="0 0 20 20" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M14.2764 0.842802C15.5951 0.760387 16.8954 1.21825 17.8752 2.11565C18.7727 3.09547 19.2305 4.39579 19.1573 5.72359V14.2764C19.2397 15.6042 18.7727 16.9045 17.8844 17.8843C16.9046 18.7817 15.5951 19.2396 14.2764 19.1572H5.72355C4.39575 19.2396 3.09541 18.7817 2.11559 17.8843C1.21817 16.9045 0.760311 15.6042 0.842726 14.2764V5.72359C0.760311 4.39579 1.21817 3.09547 2.11559 2.11565C3.09541 1.21825 4.39575 0.760387 5.72355 0.842802H14.2764ZM9.06595 14.4412L15.2288 8.26013C15.7874 7.69238 15.7874 6.77666 15.2288 6.21807L14.0383 5.02764C13.4706 4.45989 12.5549 4.45989 11.9871 5.02764L11.3736 5.65033C11.282 5.7419 11.282 5.89757 11.3736 5.98914C11.3736 5.98914 12.8296 7.43598 12.8571 7.47261C12.9578 7.5825 13.0219 7.72901 13.0219 7.89384C13.0219 8.2235 12.7563 8.49821 12.4175 8.49821C12.2618 8.49821 12.1153 8.43411 12.0146 8.33339L10.4853 6.81329C10.4121 6.74003 10.2839 6.74003 10.2106 6.81329L5.84259 11.1813C5.5404 11.4835 5.36642 11.8864 5.35726 12.3168L5.30231 14.487C5.30231 14.6061 5.33894 14.7159 5.42136 14.7984C5.50377 14.8808 5.61366 14.9266 5.73271 14.9266H7.88466C8.32421 14.9266 8.74545 14.7526 9.06595 14.4412Z" fill="#FB9400"/>
-</Svg>
-</View>
+<TouchableOpacity onPress={handleEditPress} style={styles.__iconlyBoldEditSquare}>
+  <Svg style={styles.____________group} width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <Path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M14.2764 0.842802C15.5951 0.760387 16.8954 1.21825 17.8752 2.11565C18.7727 3.09547 19.2305 4.39579 19.1573 5.72359V14.2764C19.2397 15.6042 18.7727 16.9045 17.8844 17.8843C16.9046 18.7817 15.5951 19.2396 14.2764 19.1572H5.72355C4.39575 19.2396 3.09541 18.7817 2.11559 17.8843C1.21817 16.9045 0.760311 15.6042 0.842726 14.2764V5.72359C0.760311 4.39579 1.21817 3.09547 2.11559 2.11565C3.09541 1.21825 4.39575 0.760387 5.72355 0.842802H14.2764ZM9.06595 14.4412L15.2288 8.26013C15.7874 7.69238 15.7874 6.77666 15.2288 6.21807L14.0383 5.02764C13.4706 4.45989 12.5549 4.45989 11.9871 5.02764L11.3736 5.65033C11.282 5.7419 11.282 5.89757 11.3736 5.98914C11.3736 5.98914 12.8296 7.43598 12.8571 7.47261C12.9578 7.5825 13.0219 7.72901 13.0219 7.89384C13.0219 8.2235 12.7563 8.49821 12.4175 8.49821C12.2618 8.49821 12.1153 8.43411 12.0146 8.33339L10.4853 6.81329C10.4121 6.74003 10.2839 6.74003 10.2106 6.81329L5.84259 11.1813C5.5404 11.4835 5.36642 11.8864 5.35726 12.3168L5.30231 14.487C5.30231 14.6061 5.33894 14.7159 5.42136 14.7984C5.50377 14.8808 5.61366 14.9266 5.73271 14.9266H7.88466C8.32421 14.9266 8.74545 14.7526 9.06595 14.4412Z"
+      fill="#FB9400"
+    />
+  </Svg>
+</TouchableOpacity>
 <View style={styles.group22}>
 <View style={styles._maskGroup}>
 <View style={styles._mask}/>
