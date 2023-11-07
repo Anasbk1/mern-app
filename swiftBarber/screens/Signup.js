@@ -12,7 +12,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 export default function _Dark_signupblankform({navigation}) {
 
-  const [name, setName]=useState('');
+  const [displayName, setName]=useState('');
   const [email, setEmail]=useState('');
   const [password, setPassword]=useState('');
   const [loading, setLoading] = useState(false);
@@ -24,14 +24,14 @@ export default function _Dark_signupblankform({navigation}) {
   console.log(email,password,FIREBASE_AUTH); 
     try {
 
-     const credentials =  await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
+     const credentials =  await createUserWithEmailAndPassword(FIREBASE_AUTH ,email, password);
      const user = credentials.user
      
      
       await axios
         .post(`http://${ADDRESS_IP}:3001/users/register`, {
           
-          name: name,
+          name: displayName,
           email: email,
           
         })
@@ -76,7 +76,7 @@ export default function _Dark_signupblankform({navigation}) {
                       <View style={styles.statusDefaultTypeDefaultStateDefaultInputThemeDarkComponentInputField}>
                           <TextInput style={styles.fullname}
                               placeholder='Full Name' 
-                              value={name}
+                              value={displayName}
                               onChangeText={(text)=>setName(text)}
                           />
                       </View>
@@ -287,7 +287,7 @@ export default function _Dark_signupblankform({navigation}) {
           flexShrink: 0,
           textAlign: "left",
           color: "rgba(255, 255, 255, 1)",
-          fontFamily: "Urbanist",
+          //fontFamily: "Urbanist",
           fontSize: 48,
           fontWeight: "700",
           letterSpacing: 0,
@@ -311,7 +311,7 @@ export default function _Dark_signupblankform({navigation}) {
           flexBasis: 0,
           textAlign: "left",
           color: "rgba(158, 158, 158, 1)",
-          fontFamily: "Urbanist",
+          //fontFamily: "Urbanist",
           fontSize: 14,
           fontWeight: "400",
           letterSpacing: 0.20000000298023224,
@@ -357,7 +357,7 @@ export default function _Dark_signupblankform({navigation}) {
           flexBasis: 0,
           textAlign: "left",
           color: "rgba(158, 158, 158, 1)",
-          fontFamily: "Urbanist",
+          //fontFamily: "Urbanist",
           fontSize: 14,
           fontWeight: "400",
           letterSpacing: 0.20000000298023224,
@@ -396,7 +396,7 @@ export default function _Dark_signupblankform({navigation}) {
           flexBasis: 0,
           textAlign: "left",
           color: "rgba(158, 158, 158, 1)",
-          fontFamily: "Urbanist",
+          //fontFamily: "Urbanist",
           fontSize: 14,
           fontWeight: "400",
           letterSpacing: 0.20000000298023224,
@@ -437,7 +437,7 @@ export default function _Dark_signupblankform({navigation}) {
           flexShrink: 0,
           textAlign: "left",
           color: "rgba(255, 255, 255, 1)",
-          fontFamily: "Urbanist",
+          //fontFamily: "Urbanist",
           fontSize: 14,
           fontWeight: "600",
           letterSpacing: 0.20000000298023224,
@@ -462,7 +462,7 @@ export default function _Dark_signupblankform({navigation}) {
           height: 22,
           textAlign: "center",
           color: "rgba(255, 255, 255, 1)",
-          fontFamily: "Urbanist",
+          //fontFamily: "Urbanist",
           fontSize: 16,
           fontWeight: "700",
           letterSpacing: 0.20000000298023224,
@@ -511,7 +511,7 @@ export default function _Dark_signupblankform({navigation}) {
           flexShrink: 0,
           textAlign: "center",
           color: "rgba(245, 245, 245, 1)",
-          fontFamily: "Urbanist",
+          //fontFamily: "Urbanist",
           fontSize: 18,
           fontWeight: "600",
           letterSpacing: 0.20000000298023224,
@@ -694,7 +694,7 @@ export default function _Dark_signupblankform({navigation}) {
           flexShrink: 0,
           textAlign: "right",
           color: "rgba(245, 245, 245, 1)",
-          fontFamily: "Urbanist",
+          //fontFamily: "Urbanist",
           fontSize: 14,
           fontWeight: "400",
           letterSpacing: 0.20000000298023224,
@@ -704,7 +704,7 @@ export default function _Dark_signupblankform({navigation}) {
           flexShrink: 0,
           textAlign: "left",
           color: "rgba(251, 148, 0, 1)",
-          fontFamily: "Urbanist",
+          //fontFamily: "Urbanist",
           fontSize: 14,
           fontWeight: "600",
           letterSpacing: 0.20000000298023224,

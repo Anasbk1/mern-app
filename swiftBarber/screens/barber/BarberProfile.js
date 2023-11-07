@@ -5,13 +5,14 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import ADDRESS_IP from '../API.js';
 import { MyContext } from '../../useContext/useContext';
+import { dataStore } from '../../store.js';
 
 export default function _Dark_profilesettings({route}) {
   const {emailBarber} = route.params;
   const [barberName,setBarberName] = useState('');
   const navigation = useNavigation();
   const context = useContext(MyContext);
-  
+  const {setBarberId}=dataStore()
 
     useEffect(() => {
       const fetchBarberName = async () => {
@@ -23,6 +24,7 @@ export default function _Dark_profilesettings({route}) {
             const barber = data[0];
             const name = barber.name;
             setBarberName(name);
+            setBarberId(barber)
             context.barberName = name
           }
         } catch (error) {
@@ -198,9 +200,9 @@ export default function _Dark_profilesettings({route}) {
 </Svg>
 
             						</View>
-            						<Text style={styles.privacyPolicy}>
-              							{`Privacy Policy`}
-            						</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Privacy')}>
+      <Text style={styles.privacyPolicy}>Privacy Policy</Text>
+    </TouchableOpacity>
             						{/* RN-Flow:: can be replaced with <____iconlyLightArrowRight2  /> */}
             						<View style={styles.____iconlyLightArrowRight2}>
               							{/* RN-Flow:: can be replaced with <_____iconlyLightArrowRight2  /> */}
@@ -366,7 +368,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 24,
     fontWeight: "700",
     letterSpacing: 0,
@@ -427,7 +429,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 24,
     fontWeight: "700",
     letterSpacing: 0,
@@ -438,7 +440,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 14,
     fontWeight: "600",
     letterSpacing: 0.20000000298023224,
@@ -494,7 +496,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 18,
     fontWeight: "600",
     letterSpacing: 0.20000000298023224,
@@ -553,7 +555,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 18,
     fontWeight: "600",
     letterSpacing: 0.20000000298023224,
@@ -612,7 +614,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 18,
     fontWeight: "600",
     letterSpacing: 0.20000000298023224,
@@ -668,7 +670,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 18,
     fontWeight: "600",
     letterSpacing: 0.20000000298023224,
@@ -727,7 +729,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(247, 85, 85, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 18,
     fontWeight: "600",
     letterSpacing: 0.20000000298023224,
@@ -803,7 +805,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 10,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224
@@ -827,7 +829,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 10,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224
@@ -859,7 +861,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 10,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224
@@ -891,7 +893,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 10,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224
@@ -923,7 +925,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(251, 148, 0, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 10,
     fontWeight: "700",
     letterSpacing: 0.20000000298023224

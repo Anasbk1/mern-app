@@ -78,7 +78,8 @@ const deleteUser = async (req, res) => {
 const getOneByemail = async (req, res) => {
     try {
         const mails = await prisma.user.findMany({ where: { email: req.params.mail } });
-        res.status(200).json(mails);
+        console.log(mails)
+        res.status(200).send(mails);
     } catch (err) {
         res.status(500).json(err);
     }

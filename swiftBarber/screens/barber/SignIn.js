@@ -34,7 +34,7 @@ export default function _Dark_signupblankform({navigation}) {
           })
           .then((res) => {
             console.log(res.data);
-            navigation.navigate("Login")
+            navigation.navigate("loginBarber")
           })
           .catch((err) => {
             console.log(err);
@@ -252,7 +252,7 @@ export default function _Dark_signupblankform({navigation}) {
         flexShrink: 0,
         textAlign: "left",
         color: "rgba(255, 255, 255, 1)",
-        fontFamily: "Urbanist",
+        //fontFamily: "Urbanist",
         fontSize: 48,
         fontWeight: "700",
         letterSpacing: 0,
@@ -283,7 +283,7 @@ export default function _Dark_signupblankform({navigation}) {
         flexBasis: 0,
         textAlign: "left",
         color: "rgba(158, 158, 158, 1)",
-        fontFamily: "Urbanist",
+        //fontFamily: "Urbanist",
         fontSize: 14,
         fontWeight: "400",
         letterSpacing: 0.20000000298023224,
@@ -322,7 +322,7 @@ export default function _Dark_signupblankform({navigation}) {
         flexBasis: 0,
         textAlign: "left",
         color: "rgba(158, 158, 158, 1)",
-        fontFamily: "Urbanist",
+        //fontFamily: "Urbanist",
         fontSize: 14,
         fontWeight: "400",
         letterSpacing: 0.20000000298023224,
@@ -361,7 +361,7 @@ export default function _Dark_signupblankform({navigation}) {
         flexBasis: 0,
         textAlign: "left",
         color: "rgba(158, 158, 158, 1)",
-        fontFamily: "Urbanist",
+        //fontFamily: "Urbanist",
         fontSize: 14,
         fontWeight: "400",
         letterSpacing: 0.20000000298023224,
@@ -401,7 +401,7 @@ export default function _Dark_signupblankform({navigation}) {
         height: 22,
         textAlign: "center",
         color: "rgba(255, 255, 255, 1)",
-        fontFamily: "Urbanist",
+        //fontFamily: "Urbanist",
         fontSize: 16,
         fontWeight: "700",
         letterSpacing: 0.20000000298023224,
@@ -450,7 +450,7 @@ export default function _Dark_signupblankform({navigation}) {
         flexShrink: 0,
         textAlign: "center",
         color: "rgba(245, 245, 245, 1)",
-        fontFamily: "Urbanist",
+        //fontFamily: "Urbanist",
         fontSize: 18,
         fontWeight: "600",
         letterSpacing: 0.20000000298023224,
@@ -600,7 +600,7 @@ export default function _Dark_signupblankform({navigation}) {
         flexShrink: 0,
         textAlign: "right",
         color: "rgba(245, 245, 245, 1)",
-        fontFamily: "Urbanist",
+        //fontFamily: "Urbanist",
         fontSize: 14,
         fontWeight: "400",
         letterSpacing: 0.20000000298023224,
@@ -610,7 +610,7 @@ export default function _Dark_signupblankform({navigation}) {
         flexShrink: 0,
         textAlign: "left",
         color: "rgba(251, 148, 0, 1)",
-        fontFamily: "Urbanist",
+        //fontFamily: "Urbanist",
         fontSize: 14,
         fontWeight: "600",
         letterSpacing: 0.20000000298023224,

@@ -39,7 +39,6 @@ export default function Login({navigation}) {
         onAuthStateChanged(FIREBASE_AUTH, (barber) => {
           console.log("userFromAuth", barber);
         });
-    
         console.log(response);
         // userGetter(response.user.uid);
         navigation.navigate("BarberProfile",{emailBarber:email});
@@ -265,7 +264,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 48,
     fontWeight: "700",
     letterSpacing: 0,
@@ -311,7 +310,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 14,
     fontWeight: "400",
     letterSpacing: 0.20000000298023224,
@@ -350,7 +349,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 14,
     fontWeight: "400",
     letterSpacing: 0.20000000298023224,
@@ -390,7 +389,7 @@ const styles = StyleSheet.create({
     height: 22,
     textAlign: "center",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 0.20000000298023224,
@@ -407,7 +406,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(251, 148, 0, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 16,
     fontWeight: "600",
     letterSpacing: 0.20000000298023224,
@@ -450,7 +449,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(245, 245, 245, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 18,
     fontWeight: "600",
     letterSpacing: 0.20000000298023224,
@@ -600,7 +599,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "right",
     color: "rgba(245, 245, 245, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 14,
     fontWeight: "400",
     letterSpacing: 0.20000000298023224,
@@ -610,7 +609,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "left",
     color: "rgba(251, 148, 0, 1)",
-    fontFamily: "Urbanist",
+    //fontFamily: "Urbanist",
     fontSize: 14,
     fontWeight: "600",
     letterSpacing: 0.20000000298023224,

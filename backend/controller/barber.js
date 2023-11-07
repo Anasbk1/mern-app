@@ -49,51 +49,54 @@ const register = async (req, res) => {
 
   const updateBarber = async (req, res) => {
     const barberId = parseInt(req.params.id);
-
+    console.log(req.body);
     try {
-        // Fetch the existing barber data
-        const existingBarber = await prisma.barber.findUnique({
-            where: { id: barberId },
-        });
-
-        if (!existingBarber) {
-            return res.status(404).json({ error: "Barber not found" });
-        }
-
-        // Create an object to hold the data to update
-        const updatedData = {};
-
-        // Check the request body for fields to update and update the data object
-        if (req.body.name) {
-            updatedData.name = req.body.name;
-        }
-        if (req.body.email) {
-            updatedData.email = req.body.email;
-        }
-        if (req.body.image) {
-            updatedData.image = req.body.image;
-        }
-        if (req.body.description) {
-            updatedData.description = req.body.description;
-        }
-        if (req.body.location) {
-            updatedData.location = req.body.location;
-        }
-        if (req.body.phoneNumber) {
-            updatedData.phoneNumber = req.body.phoneNumber;
-        }
-
-        // Perform the update
-        const updatedBarber = await prisma.barber.update({
-            where: { id: barberId },
-            data: updatedData,
-        });
-
-        res.status(200).json(updatedBarber);
+      // Fetch the existing barber data
+      const existingBarber = await prisma.barber.findUnique({
+        where: { id: barberId }
+      });
+  
+      if (!existingBarber) {
+        return res.status(404).json({ error: "Barber not found" });
+      }
+  
+      // Create an object to hold the data to update
+      const updatedData = {};
+  
+      // Check the request body for fields to update and update the data object
+      if (req.body.name) {
+        updatedData.name = req.body.name;
+      }
+      if (req.body.email) {
+        updatedData.email = req.body.email;
+      }
+      if (req.body.image) {
+        updatedData.image = req.body.image;
+      }
+      if (req.body.description) {
+        updatedData.description = req.body.description;
+      }
+      if (req.body.location) {
+        updatedData.location = req.body.location;
+      }
+      if (req.body.phoneNumber) {
+        updatedData.phoneNumber = req.body.phoneNumber;
+      }
+      if (req.body.service) {
+          updatedData.service = req.body.service;
+      }
+  console.log(updatedData);
+      // Perform the update
+      const updatedBarber = await prisma.barber.update({
+        where: { id: barberId },
+        data: updatedData,
+      });
+  
+      res.status(200).json(updatedBarber);
     } catch (err) {
-        res.status(500).json(err);
+      res.status(500).json(err);
     }
-};
+  };
 
 
 const deleteBarber = async (req, res) => {

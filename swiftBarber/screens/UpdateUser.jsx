@@ -5,9 +5,9 @@ import { MyContext } from '../useContext/useContext';
 import axios from 'axios';
 import ADDRESS_IP from './API';
 import * as ImagePicker from 'expo-image-picker';
-
+import { dataStore } from '../store';
 export default function _Dark_filleprofileblankform() {
-
+const{userId}=dataStore()
 const {userName}=useContext(MyContext);
 const [newName,setNewName] =useState('');
   const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ const [newName,setNewName] =useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [iduser, setIdUser] = useState(null);
   const [modal, setModal] = useState(false);
-
+console.log("profile id",userId)
   const uploadImageToCloudinary = async (imageUri) => {
     try {
       const data = new FormData();
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    ////fontFamily: "Urbanist",
     fontSize: 24,
     fontWeight: "700",
     letterSpacing: 0,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    ////fontFamily: "Urbanist",
     fontSize: 14,
     fontWeight: "400",
     letterSpacing: 0.20000000298023224,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    ////fontFamily: "Urbanist",
     fontSize: 14,
     fontWeight: "400",
     letterSpacing: 0.20000000298023224,
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    ////fontFamily: "Urbanist",
     fontSize: 14,
     fontWeight: "400",
     letterSpacing: 0.20000000298023224,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     height: 22,
     textAlign: "center",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+    ////fontFamily: "Urbanist",
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 0.20000000298023224,
