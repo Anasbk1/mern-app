@@ -23,7 +23,8 @@ export default function Login({navigation}) {
     }
 
       const handleSignUp = () => {
-        navigation.navigate("Signup"); 
+        navigation.navigate("Signup");
+   
       };
       const resetPassword = () => {
         sendPasswordResetEmail(FIREBASE_AUTH, email)

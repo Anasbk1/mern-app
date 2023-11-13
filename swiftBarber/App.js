@@ -20,6 +20,7 @@ import Work from './screens/Work.js';
 import Privacy from './screens/barber/Privacy&Policy.js'
 import Notification from './screens/barber/Notification.js'
 import Schedule from './screens/barber/Schedule.js'
+import Gallery from './screens/barber/Gallery.js';
 
 const Stack = createStackNavigator()
 
@@ -48,7 +49,7 @@ export default function App() {
       <Stack.Screen name = 'Privacy' component={Privacy} />
       <Stack.Screen name = 'Notification' component={Notification} />
       <Stack.Screen name = 'Schedule' component={Schedule} />
-
+      <Stack.Screen name = 'Gallery' component={Gallery} />
     </Stack.Navigator>
   </NavigationContainer>
   </MyProvider>

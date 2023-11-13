@@ -63,6 +63,7 @@ const register = async (req, res) => {
           verified:false,
           barberId:req.body.barberId,
           userId:req.body.userId,
+          userName:req.body.userName
         },
       });
       res.status(201).json(reservation);

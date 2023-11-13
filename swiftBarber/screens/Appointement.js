@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View,Platform, TouchableOpacity } from 'react-native'
-import React,{useState} from 'react'
+import React,{useState,useContext} from 'react'
 import moment from "moment-timezone"
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {
@@ -11,6 +11,9 @@ import {
   } from './src/constants';
 import { dataStore } from '../store';
 import { useNavigation } from '@react-navigation/native';
+import ADDRESS_IP from './API';
+import axios from 'axios';
+import { MyContext } from '../useContext/useContext.js';
 const MODE_VALUES = Platform.select({
     ios: Object.values(IOS_MODE),
     android: Object.values(ANDROID_MODE),
@@ -23,6 +26,7 @@ const MODE_VALUES = Platform.select({
   });
   const MINUTE_INTERVALS = [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30];
 const Appointement = () => {
+    const context = useContext(MyContext);
     const navigation = useNavigation()
     const sourceMoment = moment.unix(1636765200);
   const sourceDate = sourceMoment.local().toDate();
@@ -31,13 +35,17 @@ const Appointement = () => {
   const [display, setDisplay] = useState(DISPLAY_VALUES[0]);
   const [time, setTime] = useState(undefined);
   const [tzOffsetInMinutes, setTzOffsetInMinutes] = useState(undefined);
-  const {setAppointementDate}=dataStore()
+  const {setAppointementDate,barberId,userId,appointementDate}=dataStore()
   console.log(appointement);
   console.log("time",time);
   const setAppointementTime= async(selected)=>{
       await  setAppointementDate(selected)
-        navigation.navigate("Home")
-        
+      await axios.post(`http://${ADDRESS_IP}:3001/reservation/addOne`,{
+        date:time,
+        barberId:barberId,
+        userId:userId,
+        userName:context.userName
+      }).then(()=>navigation.navigate("Home")).catch(err=>console.error(err))  
     }
           return (
     <View style={styles.container}>
@@ -56,7 +64,7 @@ display={display}
 /> }
 <View style={styles.confirmButtonContainer}>
 <TouchableOpacity onPress={()=>setAppointementTime(time)}>
-    <Text>Confirm</Text>
+    <Text >Confirm</Text>
 </TouchableOpacity>
 </View>
     </View>
@@ -69,10 +77,12 @@ const styles = StyleSheet.create({
     container:{
         flex: 1,
         alignItems:"center",
-        justifyContent:"center"
+        justifyContent:"center",
+        backgroundColor: "rgba(24, 26, 32, 1)",
     },
     confirmButtonContainer:{
         alignItems:"center",
-        justifyContent:"center"
+        justifyContent:"center",
+        
     }
 })

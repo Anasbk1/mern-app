@@ -9,21 +9,25 @@ import { MyContext } from '../../useContext/useContext.js';
 import MapView,{Marker} from "react-native-maps"
 import * as Location from 'expo-location'
 import { dataStore } from '../../store.js';
+import { useNavigation } from '@react-navigation/native';
 export default function _Dark_detailspackagedetails() {
+  const navigation= useNavigation()
     const context = useContext(MyContext);
     const BarberName=context.barberName
-    const [barberPosition, setBarberPosition] = useState({ latitude: 37.78825,
-         longitude: -122.4324,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421});
-    
+    const [barberPosition, setBarberPosition] = useState({
+      latitude: 36.7538,
+      longitude: 10.1797,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421
+    });
+    console.log(barberPosition)
    const [editing , setEditing] = useState(false)
    const {barberId}= dataStore()
     const [newName,setNewName] =useState(BarberName);
   const [email, setEmail] = useState('');
   const [image, setImage] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [description, setDescription] = useState('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor'); 
+  const [description, setDescription] = useState(''); 
   const [services, setServices] = useState({
     haircut: 'Haircut',
     hairstyling: 'Hairstyling',
@@ -34,7 +38,7 @@ export default function _Dark_detailspackagedetails() {
   const [editingDescription, setEditingDescription] = useState(false);
   const [location, setLocation] = useState(''); // Add location state
   const [phoneNumber, setPhoneNumber] = useState(''); // Add phoneNumber state
-  const [service, setService] = useState(''); // Add service state
+  const [service, setService] = useState({}); // Add service state
   
   const [idBarber, setIdBarber] = useState(null);
   const [modal, setModal] = useState(false);
@@ -150,8 +154,8 @@ const handleEditDescriptionPress = () => {
         }
       );
 
-      const imageUrl = response.data.secure_url;
-      setImageUrl(imageUrl);
+      const imageUr = response.data.secure_url;
+      setImageUrl(imageUr);
     } catch (error) {
       console.error('Error uploading image to Cloudinary:', error);
     }
@@ -178,7 +182,7 @@ const handleEditDescriptionPress = () => {
       .get(`http://${ADDRESS_IP}:3001/barbers/name/${BarberName}`)
       .then((res) => {
         setIdBarber(res.data[0].id);
-        
+        setImageUrl(res.data[0].image)
       })
       .catch((err) => {
         console.log(err);
@@ -201,13 +205,13 @@ const handleEditDescriptionPress = () => {
       updatedBarberData.description = description; // Add description to updated data
     }
     if (barberPosition !== '') {
-      updatedBarberData.location = barberPosition; // Add location to updated data
+      updatedBarberData.location = JSON.stringify(barberPosition); // Add location to updated data
     }
     if (phoneNumber !== '') {
       updatedBarberData.phoneNumber = phoneNumber; // Add phoneNumber to updated data
     }
-    if (service !== '') {
-      updatedBarberData.service = service; // Add service to updated data
+    if (service !=='') {
+      updatedBarberData.service = services; // Add service to updated data
     }
     
 
@@ -239,7 +243,6 @@ const handleEditDescriptionPress = () => {
     return (
       <ScrollView>
       <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
-   
       <View style={styles._Dark_detailspackagedetails}>
 {/* RN-Flow:: can be replaced with <HomeIndicator /> */}
 <View style={styles.homeIndicator}>
@@ -256,7 +259,8 @@ const handleEditDescriptionPress = () => {
 <Path fillRule="evenodd" clipRule="evenodd" d="M9.13276 7.15793C9.13276 8.12693 8.34776 8.91193 7.37876 8.91193C6.40976 8.91193 5.62476 8.12693 5.62476 7.15793C5.62476 6.18893 6.40976 5.40393 7.37876 5.40393C8.34776 5.40493 9.13276 6.18893 9.13276 7.15793Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 </Svg>
 <Text style={styles.gallery}>
-{`gallery`}
+<TouchableOpacity onPress={()=>{navigation.navigate('Gallery')
+   console.log("gallery")}}><Text>gallery</Text></TouchableOpacity>
 </Text>
 </View>
 <View style={styles._autoLayoutVertical}>
@@ -321,6 +325,7 @@ const handleEditDescriptionPress = () => {
           height: 350,
           width: 400,
         }}
+        region={barberPosition}
         onPress={handleMapPress}
       >
         {barberPosition && (
@@ -370,6 +375,7 @@ const handleEditDescriptionPress = () => {
           <View key={serviceName} style={styles.iconlyBoldTickSquare}>
             {editMode ? (
               <TextInput
+              style={{ color: 'gray' }}
                 value={services[serviceName]}
                 onChangeText={(newValue) =>
                   handleServiceChange(serviceName, newValue)
@@ -452,7 +458,7 @@ const handleEditDescriptionPress = () => {
 <View style={styles.group22}>
 <View style={styles._maskGroup}>
 <View style={styles._mask}/>
-<ImageBackground style={styles._image} source={{uri: /* dummy image */ imageUrl}}/>
+<ImageBackground style={styles._image} source={{uri:imageUrl}}/>
 </View>
 {/* RN-Flow:: can be replaced with <___iconlyBoldEditSquare /> */}
 <TouchableOpacity onPress={pickImage}>

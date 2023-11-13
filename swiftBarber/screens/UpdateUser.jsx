@@ -161,30 +161,27 @@ console.log("profile id",userId)
               							</View>
             						</View>
             						{/* RN-Flow:: can be replaced with <StatusDefaultTypeDefaultStateDefaultInputThemeDarkComponentInputField status={"default"} type={"default"} state={"defaultInput"} theme={"dark"} component={"inputField"} /> */}
-            						<View style={styles.statusDefaultTypeDefaultStateDefaultInputThemeDarkComponentInputField}>
-              							<Text style={styles.label}>
-                								{`Full Name`}
-              							</Text>
-            						</View>
+            						
             						{/* RN-Flow:: can be replaced with <_statusDefaultTypeDefaultStateDefaultInputThemeDarkComponentInputField status={"default"} type={"default"} state={"defaultInput"} theme={"dark"} component={"inputField"} /> */}
             						<View style={styles._statusDefaultTypeDefaultStateDefaultInputThemeDarkComponentInputField}>
   
   <TextInput 
   style={{color:'gray'}}
     placeholder='Nickname'
-    placeholderTextColor="gray"
+    placeholderTextColor="white"
     onChangeText={setNewName} // Assuming `setNewName` is a function that updates the new name state
     value={newName} // Assuming `newName` is the state variable holding the new name value
   />
 </View>
             						{/* RN-Flow:: can be replaced with <StatusDefaultTypeNormalStateDefaultInputThemeDarkComponentInputField status={"default"} type={"normal"} state={"defaultInput"} theme={"dark"} component={"inputField"} /> */}
-                        <View style={styles.statusDefaultTypeNormalStateDefaultInputThemeDarkComponentInputField}>
+                        <View style={styles._statusDefaultTypeDefaultStateDefaultInputThemeDarkComponentInputField}>
   
   <TextInput
-    style={styles._input} // Define the appropriate style for your input
+    style={{color : 'gray'}} // Define the appropriate style for your input
     onChangeText={setEmail} // Assuming `setEmail` is a function that updates the email state
     value={email} // Assuming `email` is the state variable holding the email value
     placeholder="Enter your email"
+    placeholderTextColor='white'
   />
 </View>
           					</View>

@@ -70,6 +70,7 @@ model Admin {
 
 model Reservation {
   id     Int      @id @default(autoincrement())
+  userName String @default("unkown")
   date   String 
   verified Boolean
   barber  Barber @relation(fields: [barberId], references: [id])

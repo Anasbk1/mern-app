@@ -1,24 +1,28 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, ImageBackground, StyleSheet, TouchableOpacity,TouchableHighlight } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet, TouchableOpacity,TouchableHighlight,TextInput} from 'react-native';
 import { Svg, Path, Circle, G, Defs, LinearGradient, Stop, Line } from 'react-native-svg';
+import { signOut } from "firebase/auth";
 import { useNavigation } from '@react-navigation/native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView  } from 'react-native-gesture-handler';
 import axios from 'axios';
 import ADDRESS_IP from './API.js';
 import { dataStore } from '../store.js';
 import { MyContext } from '../useContext/useContext.js';
-
+import * as Location from 'expo-location'
+import Icon  from 'react-native-vector-icons/MaterialIcons'
+import { FIREBASE_AUTH } from "../Firebase/index";
 export default function _Dark_homefullpage({ route }) {
   const {setUserId,userMail,setUserMail}= dataStore()
   const {userId}= dataStore()
-  
-  
   const navigation = useNavigation();
   const context = useContext(MyContext);
   const [ userName, setUserName ] = useState('');
   const [barbers, setBarbers] = useState([]);
   const [isBookmarkActive, setIsBookmarkActive] = useState(false);
   const [selectedBarbers, setSelectedBarbers] = useState({});
+  const [barbersData, setSelectedBarbersData] = useState([]);
+  const [position , setPosition] = useState({})
+  const [searched,setSearched]=useState("")
   // Function to toggle the bookmark style
   const toggleBookmark = (barberId) => {
     setSelectedBarbers((prevSelectedBarbers) => ({
@@ -26,7 +30,21 @@ export default function _Dark_homefullpage({ route }) {
       [barberId]: !prevSelectedBarbers[barberId],
     }));
   }
-  console.log(selectedBarbers, 'selectedBarbers');
+  const search = (e) => {
+    const filteredData = barbersData.filter((data) => data.includes(e));
+    // Do something with the filteredData, for example, log it or update state
+    console.log(filteredData);
+    // If you want to use the filteredData in some way, return it
+    return filteredData;
+  }
+  const logOut = async () => {
+    try {
+      await signOut(FIREBASE_AUTH);
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  }
 
   useEffect(() => {
     if(route.params.emailUser){
@@ -34,23 +52,22 @@ export default function _Dark_homefullpage({ route }) {
       setUserMail(emailUser)
     }
     (function async () {
-      try {
         axios.get(`http://${ADDRESS_IP}:3001/users/email/${userMail}`).then((response) => { 
         const data = response.data;
-        console.log("data",response.data)
+      
           const user = data[0];
           const name = user.name;
           setUserName(name);
           console.log(user.id);
           setUserId(user.id);
           context.userName = name})
-      } catch (error) {
-        console.log('Error fetching user name:', error);
+       .catch((error)=>
+        console.error('Error fetching user name:', error));
       }
-    })()
+    )()
   }, [context]);
   
-  console.log("zustand",userId)
+  
 
  
 
@@ -59,12 +76,71 @@ export default function _Dark_homefullpage({ route }) {
       .then(response => response.json())
       .then(data => {
         setBarbers(data);
+        console.log(barbers[0].location);
         
-        console.log(barberId, "barbers id"); 
       })
       .catch(error => console.log(error));
   }, []);
+
+  useEffect(() => {
+    let selectedBarberIds = selectedBarbers
+     selectedBarberIds = Object.keys(selectedBarbers)
+      .filter(barberId => selectedBarbers[barberId]);
+     
+    const barbersData = barbers.filter(barber => selectedBarberIds.includes(String(barber.id)));
+    setSelectedBarbersData(barbersData);
+  }, [selectedBarbers, barbers]);
+
+
   
+
+  const getUserLocation = async () => {
+    try {
+        // Request permission to access location
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            console.error('Permission to access location was denied');
+            return;
+        }
+
+        // Get the user's current position
+        const location = await Location.getCurrentPositionAsync({ enableHighAccuracy: true });
+
+        // Extract latitude and longitude
+        const { latitude, longitude } = location.coords;
+
+        // Update the position state
+        setPosition({ latitude, longitude });
+    } catch (error) {
+        console.error('Error getting user location:', error.message);
+    }
+};
+
+// Call getUserLocation when the component mounts
+useEffect(() => {
+    getUserLocation();
+}, []);
+
+
+
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c;
+
+
+  return distance.toFixed(1) ;
+}
+
+
+
+ 
+
  
     return (
      
@@ -72,6 +148,7 @@ export default function _Dark_homefullpage({ route }) {
     
       <ScrollView>
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
+    
     		<View style={styles._Dark_homefullpage}>
       			<View style={styles.autoLayoutVertical}>
         				<View style={styles._autoLayoutVertical}>
@@ -101,18 +178,18 @@ export default function _Dark_homefullpage({ route }) {
               							</View>
               							{/* RN-Flow:: can be replaced with <IconlyCurvedBookmark  /> */}
               							<View style={styles.iconlyCurvedBookmark}>
-                            <TouchableOpacity onPress={()=>navigation.navigate('Saved')}>
+                            <TouchableOpacity onPress={()=>navigation.navigate('Saved',{ barbersData })}>
       <Svg style={styles._group} width="20" height="24" viewBox="0 0 20 24" fill="none">
         <Path d="M5.9668 8.75399H13.9643" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         <Path fillRule="evenodd" clipRule="evenodd" d="M9.96528 0.916626C2.51378 0.916626 1.25495 2.00396 1.25495 10.7505C1.25495 20.5423 1.07178 23.0833 2.93378 23.0833C4.79462 23.0833 7.83378 18.7853 9.96528 18.7853C12.0968 18.7853 15.1359 23.0833 16.9968 23.0833C18.8588 23.0833 18.6756 20.5423 18.6756 10.7505C18.6756 2.00396 17.4168 0.916626 9.96528 0.916626Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </Svg>
     </TouchableOpacity>
-
+    <TouchableOpacity onPress={()=>logOut()}><Icon name='logout' size={30} color="white"/></TouchableOpacity>
               							</View>
             						</View>
           					</View>
           					<Text style={styles.morningDaniel}>
-            						{`Morning, ${userName} 👋`}
+            						{`Hello, ${userName} 👋`}
           					</Text>
           					{/* RN-Flow:: can be replaced with <StateDefaultSearchThemeDarkComponentSearch state={"defaultSearch"} theme={"dark"} component={"search"} /> */}
           					<View style={styles.stateDefaultSearchThemeDarkComponentSearch}>
@@ -124,9 +201,7 @@ export default function _Dark_homefullpage({ route }) {
 </Svg>
 
             						</View>
-            						<Text style={styles.search}>
-              							{`Search`}
-            						</Text>
+                     
             						{/* RN-Flow:: can be replaced with <IconlyLightFilter  /> */}
             						<View style={styles.iconlyLightFilter}>
 <Svg style={styles.___group} width="16" height="14" viewBox="0 0 16 14" fill="none" >
@@ -135,46 +210,12 @@ export default function _Dark_homefullpage({ route }) {
 <Path fillRule="evenodd" clipRule="evenodd" d="M5.27256 2.70521C5.27256 1.6255 4.39076 0.75 3.30327 0.75C2.21578 0.75 1.33398 1.6255 1.33398 2.70521C1.33398 3.78492 2.21578 4.66042 3.30327 4.66042C4.39076 4.66042 5.27256 3.78492 5.27256 2.70521Z" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 <Path fillRule="evenodd" clipRule="evenodd" d="M14.6671 10.7948C14.6671 9.7151 13.786 8.8396 12.6985 8.8396C11.6103 8.8396 10.7285 9.7151 10.7285 10.7948C10.7285 11.8745 11.6103 12.75 12.6985 12.75C13.786 12.75 14.6671 11.8745 14.6671 10.7948Z" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 </Svg>
-
+<TextInput defaultValue='Search' value='Search' onChangeText={(e)=>{search(e)
+                        setSearched(e)}} style={{width:800,top:0,left:50,position:'absolute'}}/>
             						</View>
           					</View>
-          					<View style={styles.frame}>
-<Svg style={styles.____group} width="380" height="181" viewBox="0 0 380 181" fill="none" >
-<G opacity="0.5">
-<Path opacity="0.25" d="M430.422 -27.3158C426.686 -24.0533 422.644 -21.0734 418.012 -18.5175C406.934 -12.4165 393.11 -12.4164 382.031 -5.75C349.952 13.5426 350.117 48.2763 338.025 79.4765C319.016 128.521 285.922 119.499 241.645 123.939C207.409 127.366 168.022 144.445 167.739 184.844C167.563 211.203 197.132 228.658 174.304 248.01C161.481 258.881 138.689 252.132 123.981 257.02C103.651 263.769 92.4197 276.23 83.4746 291L430.398 290.293L430.422 -27.3158ZM354.324 56.0852C355.868 52.4457 356.811 48.5943 358.355 44.943C359.769 41.6098 361.325 38.3355 362.668 34.967C365.344 28.2417 368.16 21.8462 372.603 16.0749C378.449 8.47798 387.205 -1.87501 397.812 -0.756086C398.378 -0.697197 398.885 -0.0258598 398.896 0.515936C398.908 4.66184 394.995 7.53572 392.19 10.0327C387.441 14.2493 382.774 18.7014 378.366 23.2713C373.322 28.5126 369.138 34.119 366.51 40.9385C365.308 44.0479 364.365 47.2987 362.963 50.3257C361.549 53.3762 359.439 55.6023 357.059 57.9579C356.446 58.5586 355.656 58.4408 355.138 58.005C354.489 57.7105 353.959 56.945 354.324 56.0852ZM276.129 136.871C278.392 133.668 283.954 132.549 287.384 134.339C288.503 134.916 289.47 135.906 290.083 137.072C291.839 139.168 291.426 142.325 289.175 143.962C286.806 145.693 282.964 146.353 280.159 145.481C276.506 144.339 273.536 140.534 276.129 136.871ZM183.013 190.745C179.43 183.324 181.045 174.514 186.018 168.166C189.307 163.961 193.62 160.145 197.533 156.506C201.021 153.267 204.734 150.251 208.741 147.66C216.495 142.643 225.216 139.156 234.35 137.684C243.896 136.141 253.619 137.154 263.189 137.814C264.143 137.884 264.909 138.249 265.487 138.791C268.869 140.617 268.091 144.987 265.51 147.271C262.269 150.134 257.744 150.216 253.819 151.535C249.329 153.043 245.228 155.728 241.492 158.614C232.983 165.186 226.088 173.737 219.041 181.781C213.796 187.765 208.175 195.574 200.455 198.53C193.337 201.239 186.195 197.34 183.013 190.745ZM158.889 228.423C153.137 234.171 143.804 234.171 138.052 228.423C132.301 222.675 132.301 213.347 138.052 207.599C143.804 201.851 153.137 201.851 158.889 207.599C164.64 213.347 164.64 222.675 158.889 228.423ZM309.717 92.6681C297.06 105.318 276.541 105.318 263.884 92.6681C251.226 80.0183 251.226 59.5126 263.884 46.8629C276.541 34.2132 297.06 34.2132 309.717 46.8629C322.374 59.5126 322.374 80.0183 309.717 92.6681ZM335.975 36.451C331.367 41.0563 323.906 41.0563 319.31 36.451C314.702 31.8458 314.702 24.3902 319.31 19.7967C323.918 15.1915 331.378 15.1915 335.975 19.7967C340.571 24.3902 340.571 31.8576 335.975 36.451Z" fill="white"/>
-<Path opacity="0.25" d="M123.148 -27.6696C124.735 -26.0822 124.735 -23.5116 123.148 -21.9331C121.562 -20.3457 118.993 -20.3457 117.416 -21.9331C115.829 -23.5206 115.829 -26.0912 117.416 -27.6696C119.002 -29.2571 121.562 -29.2571 123.148 -27.6696ZM114.225 -67.8523C108.772 -62.3954 108.772 -53.5381 114.225 -48.0812C119.678 -42.6243 128.529 -42.6243 133.982 -48.0812C139.436 -53.5381 139.436 -62.3954 133.982 -67.8523C128.529 -73.3092 119.687 -73.3182 114.225 -67.8523ZM214.842 -109C209.569 -100.278 205.495 -91.4567 190.659 -87.4159C170.766 -82.0041 150.675 -91.4838 130.819 -90.3203C66.1292 -86.514 119.372 -21.9331 92.6828 8.94122C71.0866 33.9347 35.6187 19.395 20.5032 52.7678C11.1562 73.3958 10.2819 95.6743 -1.8682 115.698C-12.9908 134.026 -28.0793 151.109 -50 154.158V130.959C-49.6845 130.977 -49.36 130.986 -49.0536 130.986C-41.969 131.013 -35.6776 126.982 -30.5129 122.49C-22.2746 115.328 -15.1721 106.678 -8.95277 97.7309C-5.81609 93.221 -2.9408 88.7653 -1.34542 83.4617C-0.624348 81.0625 2.28699 68.6514 1.03413 65.2059C-0.209728 61.7965 -3.85117 59.6137 -7.42049 60.4525C-14.6943 62.1573 -13.6668 71.673 -15.9833 77.0578C-19.6968 85.6986 -27.4844 92.1837 -36.1914 95.3947C-40.8604 97.1175 -45.6375 98.4163 -49.991 100.545V-109H169.982C161.735 -106.312 153.1 -104.409 144.528 -103.76C142.32 -103.597 142.23 -100.522 143.987 -99.9713C146.169 -98.4109 148.638 -98.3297 151.216 -97.6984C153.019 -97.2564 170.226 -93.9011 176.382 -93.5493C184.007 -93.1073 193.228 -94.2799 199.114 -99.5564C201.241 -101.469 203.17 -103.796 203.062 -106.817C203.034 -107.557 202.89 -108.287 202.683 -109H214.842ZM10.6244 40.9791C8.96596 35.7477 3.47677 33.8986 -1.03897 36.8932C-2.98587 38.183 -4.70743 40.2034 -4.83362 42.6026C-4.95981 42.8191 -5.06798 43.0536 -5.14009 43.3152C-6.75349 48.6729 -1.02094 52.3529 3.73816 51.929C9.22735 51.4329 12.2559 46.1293 10.6244 40.9791Z" fill="white"/>
-</G>
-</Svg>
-
-            						<View style={styles.__autoLayoutVertical}>
-              							<View style={styles.__autoLayoutHorizontal}>
-                								<View style={styles.___autoLayoutVertical}>
-                  									<Text style={styles.oFF}>
-                    										{`30% OFF`}
-                  									</Text>
-                  									<Text style={styles.todaysSpecial}>
-                    										{`Today’s Special`}
-                  									</Text>
-                								</View>
-                								<View style={styles.____autoLayoutVertical}>
-                  									<Text style={styles.myVar}>
-                    										{`30%`}
-                  									</Text>
-                								</View>
-              							</View>
-              							<Text style={styles.getadiscountforeveryserviceorderOnlyvalidfortoday}>
-                								{`Get a discount for every service order!\nOnly valid for today!`}
-              							</Text>
-            						</View>
-            						<View style={styles.___autoLayoutHorizontal}>
-              							<View style={styles._rectangle}/>
-              							<View style={styles.__rectangle}/>
-              							<View style={styles.___rectangle}/>
-              							<View style={styles.____rectangle}/>
-              							<View style={styles._____rectangle}/>
-            						</View>
-          					</View>
-          					<View style={styles.____autoLayoutHorizontal}>
+          			
+          					<View style={styles.____autoLayoutHorizontal}>  
             						<View style={styles._____autoLayoutVertical}>
               							<View style={styles._____autoLayoutHorizontal}>
                 								<View style={styles._frame}>
@@ -291,7 +332,7 @@ export default function _Dark_homefullpage({ route }) {
           					</View>
           					<View style={styles._________autoLayoutHorizontal}>
             						<Text style={styles.nearbyYourLocation}>
-              							{`Nearby Your Location`}
+              							{`Our barbers`}
             						</Text>
             						<Text style={styles.seeAll}>
               							{`See All`}
@@ -330,16 +371,18 @@ export default function _Dark_homefullpage({ route }) {
             						</View>
           					</View>
                     {barbers.map((barber) => (
+                      
       <View style={styles.themeDarkComponentBarberandSalonList} key={barber.id}>
-        <View style={styles.maskGroup}>
-          <View style={styles.mask} />
-          <TouchableOpacity onPress={() => navigation.navigate('BarberDetail')}>
+        <View style={styles.maskGroup}>  
+        <View style={styles.mask} />
+          <TouchableOpacity onPress={() => navigation.navigate('BarberDetail',barber={barber})}>
+          
             <ImageBackground
               style={styles.______rectangle}
               source={{ uri: barber.image }}
             />
           </TouchableOpacity>
-        </View>
+          </View>
         <View style={styles.__________autoLayoutVertical}>
           <View style={styles.___________autoLayoutHorizontal}>
             <Text style={styles.barberSalonName}>{barber.name}</Text>
@@ -351,7 +394,14 @@ export default function _Dark_homefullpage({ route }) {
       </View>
     </TouchableHighlight>
           </View>
-          <Text style={styles.barberSalonAddress}>{barber.location}</Text>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+  <Svg style={{...styles.group, marginLeft: -17}} width="12" height="14" viewBox="0 0 12 14" fill="none">
+    <Path fillRule="evenodd" clipRule="evenodd" d="M0.333984 5.87867C0.333984 2.81209 2.89657 0.333496 5.99628 0.333496C9.10473 0.333496 11.6673 2.81209 11.6673 5.87867C11.6673 7.42396 11.1053 8.85858 10.1803 10.0745C9.15985 11.4158 7.90209 12.5845 6.48635 13.5018C6.16233 13.7138 5.8699 13.7298 5.51428 13.5018C4.09047 12.5845 2.83271 11.4158 1.82098 10.0745C0.895307 8.85858 0.333984 7.42396 0.333984 5.87867ZM4.13014 6.05133C4.13014 7.07863 4.96842 7.88661 5.99628 7.88661C7.02481 7.88661 7.87117 7.07863 7.87117 6.05133C7.87117 5.03203 7.02481 4.18472 5.99628 4.18472C4.96842 4.18472 4.13014 5.03203 4.13014 6.05133Z" fill="#FB9400" />
+  </Svg>
+  <Text style={styles.barberSalonAddress}> {calculateDistance( position.latitude, position.longitude, parseFloat(JSON.parse(barber.location).latitude), parseFloat(JSON.parse(barber.location).longitude) )} km </Text>
+</View>
+
           <View style={styles.____________autoLayoutHorizontal}>
             {/* Your other components */}
           </View>
@@ -359,208 +409,15 @@ export default function _Dark_homefullpage({ route }) {
       </View>
     ))}
 
-          					<View style={styles.__________________________autoLayoutHorizontal}>
-            						<Text style={styles.mostPopular}>
-              							{`Most Popular`}
-            						</Text>
-            						<Text style={styles._seeAll}>
-              							{`See All`}
-            						</Text>
-          					</View>
-          					<View style={styles.___________________________autoLayoutHorizontal}>
-            						{/* RN-Flow:: can be replaced with <_sizeMediumTypeFilledIconNoneComponentChips size={"medium"} type={"filled"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles._sizeMediumTypeFilledIconNoneComponentChips}>
-              							<Text style={styles._____chips}>
-                								{`All`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <____sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.____sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles.______chips}>
-                								{`Haircuts`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <_____sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles._____sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles._______chips}>
-                								{`Make up`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <______sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.______sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles.________chips}>
-                								{`Manicure`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <_______sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles._______sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles._________chips}>
-                								{`Massage`}
-              							</Text>
-            						</View>
-          					</View>
+          				
+          					
           					<View style={styles._____________autoLayoutVertical}>
             						{/* RN-Flow:: can be replaced with <___themeDarkComponentBarberandSalonList theme={"dark"} component={"barberandSalonList"} /> */}
-            						<View style={styles.___themeDarkComponentBarberandSalonList}>
-              							<View style={styles.___maskGroup}>
-                								<View style={styles.___mask}/>
-                								<ImageBackground style={styles._________rectangle} source={{uri: /* dummy image */ 'https://dummyimage.com/80x80/000/fff.jpg'}}/>
-              							</View>
-              							<View style={styles.______________autoLayoutVertical}>
-                								<View style={styles.____________________________autoLayoutHorizontal}>
-                  									<Text style={styles.___barberSalonName}>
-                    										{`Hair Force`}
-                  									</Text>
-                  									{/* RN-Flow:: can be replaced with <__iconlyLightBookmark  /> */}
-                  									<View style={styles.__iconlyLightBookmark}>
-<Svg style={styles.______________group} width="18" height="22" viewBox="0 0 18 22" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M16.7381 5.15368C16.7381 2.40281 14.8574 1.30005 12.1496 1.30005H5.7907C3.16614 1.30005 1.19922 2.32762 1.19922 4.97022V19.694C1.19922 20.4198 1.98017 20.877 2.61275 20.5221L8.99471 16.9422L15.3215 20.5161C15.9551 20.873 16.7381 20.4158 16.7381 19.689V5.15368Z" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M5.26953 8.02811H12.5878" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-</Svg>
-
-                  									</View>
-                								</View>
-                								<Text style={styles.___barberSalonAddress}>
-                  									{`813 Village Drive`}
-                								</Text>
-                								<View style={styles._____________________________autoLayoutHorizontal}>
-                  									<View style={styles.______________________________autoLayoutHorizontal}>
-                    										{/* RN-Flow:: can be replaced with <___iconlyBoldLocation  /> */}
-                    										<View style={styles.___iconlyBoldLocation}>
-<Svg style={styles._______________group} width="12" height="14" viewBox="0 0 12 14" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M0.333984 5.87842C0.333984 2.81185 2.89657 0.333252 5.99628 0.333252C9.10473 0.333252 11.6673 2.81185 11.6673 5.87842C11.6673 7.42371 11.1053 8.85834 10.1803 10.0743C9.15985 11.4156 7.90209 12.5842 6.48635 13.5015C6.16233 13.7135 5.8699 13.7295 5.51428 13.5015C4.09047 12.5842 2.83271 11.4156 1.82098 10.0743C0.895307 8.85834 0.333984 7.42371 0.333984 5.87842ZM4.13014 6.05109C4.13014 7.07839 4.96842 7.88637 5.99628 7.88637C7.02481 7.88637 7.87116 7.07839 7.87116 6.05109C7.87116 5.03178 7.02481 4.18447 5.99628 4.18447C4.96842 4.18447 4.13014 5.03178 4.13014 6.05109Z" fill="#FB9400"/>
-</Svg>
-
-                    										</View>
-                    										<Text style={styles.___km}>
-                      											{`3.4 km`}
-                    										</Text>
-                  									</View>
-                  									<View style={styles._______________________________autoLayoutHorizontal}>
-                    										<View style={styles.________________________________autoLayoutHorizontal}>
-                      											{/* RN-Flow:: can be replaced with <___iconlyBulkStar  /> */}
-                      											<View style={styles.___iconlyBulkStar}>
-<Svg style={styles.________________group} width="14" height="14" viewBox="0 0 14 14" fill="none" >
-<Path opacity="0.4" d="M7.65152 1.07582L9.13584 4.05867C9.24519 4.27478 9.45391 4.42486 9.69462 4.45821L13.0287 4.94379C13.2234 4.97114 13.4001 5.07386 13.5194 5.2306C13.6375 5.38535 13.6881 5.58145 13.6595 5.77421C13.6361 5.93429 13.5608 6.08237 13.4454 6.19576L11.0296 8.53762C10.8529 8.70103 10.7729 8.94316 10.8155 9.17994L11.4103 12.4723C11.4737 12.8698 11.2103 13.2447 10.8155 13.3201C10.6528 13.3461 10.4861 13.3187 10.3394 13.244L7.36546 11.6946C7.14474 11.5832 6.88402 11.5832 6.66331 11.6946L3.68933 13.244C3.32392 13.4381 2.87116 13.306 2.66778 12.9459C2.59243 12.8025 2.56576 12.639 2.59043 12.4796L3.18523 9.18661C3.2279 8.95049 3.14722 8.70704 2.97118 8.54362L0.555329 6.2031C0.267934 5.92562 0.259265 5.46872 0.535991 5.18124C0.541993 5.17524 0.548661 5.16857 0.555329 5.1619C0.67002 5.04518 0.820719 4.97114 0.983421 4.95179L4.31747 4.46555C4.55752 4.43153 4.76623 4.28279 4.87626 4.06534L6.30723 1.07582C6.43459 0.819694 6.69865 0.660279 6.98538 0.66695H7.07473C7.32345 0.696965 7.54016 0.851043 7.65152 1.07582Z" fill="#FB9400"/>
-<Path d="M6.99533 11.6115C6.86619 11.6155 6.74039 11.6502 6.62723 11.7122L3.6678 13.2582C3.30569 13.431 2.87236 13.2969 2.66934 12.9506C2.59412 12.8091 2.56683 12.647 2.59213 12.4882L3.18321 9.20218C3.22315 8.96332 3.14327 8.72045 2.96954 8.55232L0.552609 6.2124C0.265719 5.9315 0.260394 5.47046 0.541293 5.18289C0.545287 5.17888 0.548615 5.17555 0.552609 5.17221C0.667099 5.05879 0.814871 4.98406 0.973958 4.96071L4.3108 4.46964C4.55243 4.43894 4.76211 4.28815 4.86861 4.06931L6.31904 1.04216C6.45682 0.79796 6.72108 0.652507 7.00065 0.667853C6.99533 0.866016 6.99533 11.4767 6.99533 11.6115Z" fill="#FB9400"/>
-</Svg>
-
-                      											</View>
-                    										</View>
-                    										<Text style={styles.____8}>
-                      											{`4.6`}
-                    										</Text>
-                  									</View>
-                								</View>
-              							</View>
-            						</View>
+            						
             						{/* RN-Flow:: can be replaced with <____themeDarkComponentBarberandSalonList theme={"dark"} component={"barberandSalonList"} /> */}
-            						<View style={styles.____themeDarkComponentBarberandSalonList}>
-              							<View style={styles.____maskGroup}>
-                								<View style={styles.____mask}/>
-                								<ImageBackground style={styles.__________rectangle} source={{uri: /* dummy image */ 'https://dummyimage.com/80x80/000/fff.jpg'}}/>
-              							</View>
-              							<View style={styles._______________autoLayoutVertical}>
-                								<View style={styles._________________________________autoLayoutHorizontal}>
-                  									<Text style={styles.____barberSalonName}>
-                    										{`Serenity Salon`}
-                  									</Text>
-                  									{/* RN-Flow:: can be replaced with <_iconlyBoldBookmark  /> */}
-                  									<View style={styles._iconlyBoldBookmark}>
-<Svg style={styles._________________group} width="16" height="20" viewBox="0 0 16 20" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M4.9 0H11.07C13.78 0 15.97 1.07 16 3.79V18.97C16 19.14 15.96 19.31 15.88 19.46C15.75 19.7 15.53 19.88 15.26 19.96C15 20.04 14.71 20 14.47 19.86L7.99 16.62L1.5 19.86C1.351 19.939 1.18 19.99 1.01 19.99C0.45 19.99 0 19.53 0 18.97V3.79C0 1.07 2.2 0 4.9 0ZM4.22 7.62H11.75C12.18 7.62 12.53 7.269 12.53 6.83C12.53 6.39 12.18 6.04 11.75 6.04H4.22C3.79 6.04 3.44 6.39 3.44 6.83C3.44 7.269 3.79 7.62 4.22 7.62Z" fill="#FB9400"/>
-</Svg>
-
-                  									</View>
-                								</View>
-                								<Text style={styles.____barberSalonAddress}>
-                  									{`88 Commercial Plaza`}
-                								</Text>
-                								<View style={styles.__________________________________autoLayoutHorizontal}>
-                  									<View style={styles.___________________________________autoLayoutHorizontal}>
-                    										{/* RN-Flow:: can be replaced with <____iconlyBoldLocation  /> */}
-                    										<View style={styles.____iconlyBoldLocation}>
-<Svg style={styles.__________________group} width="12" height="14" viewBox="0 0 12 14" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M0.333984 5.87842C0.333984 2.81185 2.89657 0.333252 5.99628 0.333252C9.10473 0.333252 11.6673 2.81185 11.6673 5.87842C11.6673 7.42371 11.1053 8.85834 10.1803 10.0743C9.15985 11.4156 7.90209 12.5842 6.48635 13.5015C6.16233 13.7135 5.8699 13.7295 5.51428 13.5015C4.09047 12.5842 2.83271 11.4156 1.82098 10.0743C0.895307 8.85834 0.333984 7.42371 0.333984 5.87842ZM4.13014 6.05109C4.13014 7.07839 4.96842 7.88637 5.99628 7.88637C7.02481 7.88637 7.87116 7.07839 7.87116 6.05109C7.87116 5.03178 7.02481 4.18447 5.99628 4.18447C4.96842 4.18447 4.13014 5.03178 4.13014 6.05109Z" fill="#FB9400"/>
-</Svg>
-
-                    										</View>
-                    										<Text style={styles.____km}>
-                      											{`4.2 km`}
-                    										</Text>
-                  									</View>
-                  									<View style={styles.____________________________________autoLayoutHorizontal}>
-                    										<View style={styles._____________________________________autoLayoutHorizontal}>
-                      											{/* RN-Flow:: can be replaced with <____iconlyBulkStar  /> */}
-                      											<View style={styles.____iconlyBulkStar}>
-<Svg style={styles.___________________group} width="14" height="14" viewBox="0 0 14 14" fill="none" >
-<Path opacity="0.4" d="M7.65152 1.07582L9.13584 4.05867C9.24519 4.27478 9.45391 4.42486 9.69462 4.45821L13.0287 4.94379C13.2234 4.97114 13.4001 5.07386 13.5194 5.2306C13.6375 5.38535 13.6881 5.58145 13.6595 5.77421C13.6361 5.93429 13.5608 6.08237 13.4454 6.19576L11.0296 8.53762C10.8529 8.70103 10.7729 8.94316 10.8155 9.17994L11.4103 12.4723C11.4737 12.8698 11.2103 13.2447 10.8155 13.3201C10.6528 13.3461 10.4861 13.3187 10.3394 13.244L7.36546 11.6946C7.14474 11.5832 6.88402 11.5832 6.66331 11.6946L3.68933 13.244C3.32392 13.4381 2.87116 13.306 2.66778 12.9459C2.59243 12.8025 2.56576 12.639 2.59043 12.4796L3.18523 9.18661C3.2279 8.95049 3.14722 8.70704 2.97118 8.54362L0.555329 6.2031C0.267934 5.92562 0.259265 5.46872 0.535991 5.18124C0.541993 5.17524 0.548661 5.16857 0.555329 5.1619C0.67002 5.04518 0.820719 4.97114 0.983421 4.95179L4.31747 4.46555C4.55752 4.43153 4.76623 4.28279 4.87626 4.06534L6.30723 1.07582C6.43459 0.819694 6.69865 0.660279 6.98538 0.66695H7.07473C7.32345 0.696965 7.54016 0.851043 7.65152 1.07582Z" fill="#FB9400"/>
-<Path d="M6.99533 11.6115C6.86619 11.6155 6.74039 11.6502 6.62723 11.7122L3.6678 13.2582C3.30569 13.431 2.87236 13.2969 2.66934 12.9506C2.59412 12.8091 2.56683 12.647 2.59213 12.4882L3.18321 9.20218C3.22315 8.96332 3.14327 8.72045 2.96954 8.55232L0.552609 6.2124C0.265719 5.9315 0.260394 5.47046 0.541293 5.18289C0.545287 5.17888 0.548615 5.17555 0.552609 5.17221C0.667099 5.05879 0.814871 4.98406 0.973958 4.96071L4.3108 4.46964C4.55243 4.43894 4.76211 4.28815 4.86861 4.06931L6.31904 1.04216C6.45682 0.79796 6.72108 0.652507 7.00065 0.667853C6.99533 0.866016 6.99533 11.4767 6.99533 11.6115Z" fill="#FB9400"/>
-</Svg>
-
-                      											</View>
-                    										</View>
-                    										<Text style={styles._____8}>
-                      											{`4.0`}
-                    										</Text>
-                  									</View>
-                								</View>
-              							</View>
-            						</View>
+            					
             						{/* RN-Flow:: can be replaced with <_____themeDarkComponentBarberandSalonList theme={"dark"} component={"barberandSalonList"} /> */}
-            						<View style={styles._____themeDarkComponentBarberandSalonList}>
-              							<View style={styles._____maskGroup}>
-                								<View style={styles._____mask}/>
-                								<ImageBackground style={styles.___________rectangle} source={{uri: /* dummy image */ 'https://dummyimage.com/80x80/000/fff.jpg'}}/>
-              							</View>
-              							<View style={styles.________________autoLayoutVertical}>
-                								<View style={styles.______________________________________autoLayoutHorizontal}>
-                  									<Text style={styles._____barberSalonName}>
-                    										{`The Razor’s Edge`}
-                  									</Text>
-                  									{/* RN-Flow:: can be replaced with <___iconlyLightBookmark  /> */}
-                  									<View style={styles.___iconlyLightBookmark}>
-<Svg style={styles.____________________group} width="18" height="22" viewBox="0 0 18 22" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M16.7381 5.15368C16.7381 2.40281 14.8574 1.30005 12.1496 1.30005H5.7907C3.16614 1.30005 1.19922 2.32762 1.19922 4.97022V19.694C1.19922 20.4198 1.98017 20.877 2.61275 20.5221L8.99471 16.9422L15.3215 20.5161C15.9551 20.873 16.7381 20.4158 16.7381 19.689V5.15368Z" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M5.26953 8.02811H12.5878" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-</Svg>
-
-                  									</View>
-                								</View>
-                								<Text style={styles._____barberSalonAddress}>
-                  									{`54 Artisan Avenue`}
-                								</Text>
-                								<View style={styles._______________________________________autoLayoutHorizontal}>
-                  									<View style={styles.________________________________________autoLayoutHorizontal}>
-                    										{/* RN-Flow:: can be replaced with <_____iconlyBoldLocation  /> */}
-                    										<View style={styles._____iconlyBoldLocation}>
-<Svg style={styles._____________________group} width="12" height="14" viewBox="0 0 12 14" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M0.333984 5.87842C0.333984 2.81185 2.89657 0.333252 5.99628 0.333252C9.10473 0.333252 11.6673 2.81185 11.6673 5.87842C11.6673 7.42371 11.1053 8.85834 10.1803 10.0743C9.15985 11.4156 7.90209 12.5842 6.48635 13.5015C6.16233 13.7135 5.8699 13.7295 5.51428 13.5015C4.09047 12.5842 2.83271 11.4156 1.82098 10.0743C0.895307 8.85834 0.333984 7.42371 0.333984 5.87842ZM4.13014 6.05109C4.13014 7.07839 4.96842 7.88637 5.99628 7.88637C7.02481 7.88637 7.87116 7.07839 7.87116 6.05109C7.87116 5.03178 7.02481 4.18447 5.99628 4.18447C4.96842 4.18447 4.13014 5.03178 4.13014 6.05109Z" fill="#FB9400"/>
-</Svg>
-
-                    										</View>
-                    										<Text style={styles._____km}>
-                      											{`4.5 km`}
-                    										</Text>
-                  									</View>
-                  									<View style={styles._________________________________________autoLayoutHorizontal}>
-                    										<View style={styles.__________________________________________autoLayoutHorizontal}>
-                      											{/* RN-Flow:: can be replaced with <_____iconlyBulkStar  /> */}
-                      											<View style={styles._____iconlyBulkStar}>
-<Svg style={styles.______________________group} width="14" height="14" viewBox="0 0 14 14" fill="none" >
-<Path opacity="0.4" d="M7.65152 1.07582L9.13584 4.05867C9.24519 4.27478 9.45391 4.42486 9.69462 4.45821L13.0287 4.94379C13.2234 4.97114 13.4001 5.07386 13.5194 5.2306C13.6375 5.38535 13.6881 5.58145 13.6595 5.77421C13.6361 5.93429 13.5608 6.08237 13.4454 6.19576L11.0296 8.53762C10.8529 8.70103 10.7729 8.94316 10.8155 9.17994L11.4103 12.4723C11.4737 12.8698 11.2103 13.2447 10.8155 13.3201C10.6528 13.3461 10.4861 13.3187 10.3394 13.244L7.36546 11.6946C7.14474 11.5832 6.88402 11.5832 6.66331 11.6946L3.68933 13.244C3.32392 13.4381 2.87116 13.306 2.66778 12.9459C2.59243 12.8025 2.56576 12.639 2.59043 12.4796L3.18523 9.18661C3.2279 8.95049 3.14722 8.70704 2.97118 8.54362L0.555329 6.2031C0.267934 5.92562 0.259265 5.46872 0.535991 5.18124C0.541993 5.17524 0.548661 5.16857 0.555329 5.1619C0.67002 5.04518 0.820719 4.97114 0.983421 4.95179L4.31747 4.46555C4.55752 4.43153 4.76623 4.28279 4.87626 4.06534L6.30723 1.07582C6.43459 0.819694 6.69865 0.660279 6.98538 0.66695H7.07473C7.32345 0.696965 7.54016 0.851043 7.65152 1.07582Z" fill="#FB9400"/>
-<Path d="M6.99533 11.6115C6.86619 11.6155 6.74039 11.6502 6.62723 11.7122L3.6678 13.2582C3.30569 13.431 2.87236 13.2969 2.66934 12.9506C2.59412 12.8091 2.56683 12.647 2.59213 12.4882L3.18321 9.20218C3.22315 8.96332 3.14327 8.72045 2.96954 8.55232L0.552609 6.2124C0.265719 5.9315 0.260394 5.47046 0.541293 5.18289C0.545287 5.17888 0.548615 5.17555 0.552609 5.17221C0.667099 5.05879 0.814871 4.98406 0.973958 4.96071L4.3108 4.46964C4.55243 4.43894 4.76211 4.28815 4.86861 4.06931L6.31904 1.04216C6.45682 0.79796 6.72108 0.652507 7.00065 0.667853C6.99533 0.866016 6.99533 11.4767 6.99533 11.6115Z" fill="#FB9400"/>
-</Svg>
-
-                      											</View>
-                    										</View>
-                    										<Text style={styles.______8}>
-                      											{`4.6`}
-                    										</Text>
-                  									</View>
-                								</View>
-              							</View>
-            						</View>
+            					
           					</View>
         				</View>
       			</View>
