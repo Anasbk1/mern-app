@@ -1,11 +1,21 @@
-import React from 'react';
-import { View, Text, ImageBackground, StyleSheet } from 'react-native';
+import React,{useEffect} from 'react';
+import { View, Text, ImageBackground, StyleSheet,TouchableOpacity } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
 
 export default function _Dark_homemybookmark({route}) {
   let data = route.params.barbersData;
-  console.log(data,"hello");
+  const calculateDistance = route.params.calculateDistance;
+  const getUserLocation = route.params.getUserLocation
+  const position = route.params.position
+console.log("getUserLocation", getUserLocation);
+  useEffect(() => {
+    if (getUserLocation) {
+      getUserLocation();
+    }
+  }, [getUserLocation]);
+  const navigation = useNavigation();
     return (
         <ScrollView>
         <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
@@ -28,45 +38,20 @@ export default function _Dark_homemybookmark({route}) {
               							</Text>
             						</View>
           					</View>
-          					<View style={styles._autoLayoutHorizontal}>
-            						{/* RN-Flow:: can be replaced with <SizeMediumTypeFilledIconNoneComponentChips size={"medium"} type={"filled"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.sizeMediumTypeFilledIconNoneComponentChips}>
-              							<Text style={styles.chips}>
-                								{`All`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <SizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles._chips}>
-                								{`Haircuts`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <_sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles._sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles.__chips}>
-                								{`Make up`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <__sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.__sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles.___chips}>
-                								{`Manicure`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <___sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.___sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles.____chips}>
-                								{`Massage`}
-              							</Text>
-            						</View>
-          					</View>
+          		
           					<View style={styles.__autoLayoutVertical}>
             						{/* RN-Flow:: can be replaced with <ThemeDarkComponentBarberandSalonList theme={"dark"} component={"barberandSalonList"} /> */}
                         {data.map((barber, index) => (
   <View key={index} style={styles.themeDarkComponentBarberandSalonList}>
     <View style={styles.maskGroup}>
       <View style={styles.mask} />
-      <ImageBackground style={styles.rectangle} source={{ uri: barber.imageUri }} />
+      <TouchableOpacity onPress={() => navigation.navigate('BarberDetail',barber={barber})}>
+          
+          <ImageBackground
+            style={styles.rectangle}
+            source={{ uri: barber.image }}
+          />
+        </TouchableOpacity>
     </View>
     <View style={styles.___autoLayoutVertical}>
       <View style={styles.__autoLayoutHorizontal}>
@@ -86,9 +71,12 @@ export default function _Dark_homemybookmark({route}) {
           <View style={styles.iconlyBoldLocation}>
             {/* Your location icon */}
           </View>
-          <Text style={styles.km}>
-            {`${barber.distance} km`}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+  <Svg style={{...styles.group, marginLeft: -17}} width="12" height="14" viewBox="0 0 12 14" fill="none">
+    <Path fillRule="evenodd" clipRule="evenodd" d="M0.333984 5.87867C0.333984 2.81209 2.89657 0.333496 5.99628 0.333496C9.10473 0.333496 11.6673 2.81209 11.6673 5.87867C11.6673 7.42396 11.1053 8.85858 10.1803 10.0745C9.15985 11.4158 7.90209 12.5845 6.48635 13.5018C6.16233 13.7138 5.8699 13.7298 5.51428 13.5018C4.09047 12.5845 2.83271 11.4158 1.82098 10.0745C0.895307 8.85858 0.333984 7.42396 0.333984 5.87867ZM4.13014 6.05133C4.13014 7.07863 4.96842 7.88661 5.99628 7.88661C7.02481 7.88661 7.87117 7.07863 7.87117 6.05133C7.87117 5.03203 7.02481 4.18472 5.99628 4.18472C4.96842 4.18472 4.13014 5.03203 4.13014 6.05133Z" fill="#FB9400" />
+  </Svg>
+  <Text style={styles.barberSalonAddress}> {calculateDistance( position.latitude, position.longitude, parseFloat(JSON.parse(barber.location).latitude), parseFloat(JSON.parse(barber.location).longitude) )} km </Text>
+</View>
         </View>
         <View style={styles._____autoLayoutHorizontal}>
           <View style={styles.______autoLayoutHorizontal}>

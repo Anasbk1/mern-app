@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet,ScrollView } from 'react-native';
-import { Svg, Path, Line, Circle, Defs, Pattern, Use, Image } from 'react-native-svg';
+
 import axios from 'axios';
 import ADDRESS_IP from '../API';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -14,11 +14,7 @@ export default function _Dark_detailsbarberorsalonspecialist({route}) {
 
   const [tracker, setTracker] = useState(true); // State to trigger re-render
 
-  const getAllNonVerifiedAppointments = () =>{
-    axios.get(`http://${ADDRESS_IP}:3001/reservation/getAllNonVerfiedBarberReservations/${barberId}`)
-    .then((response) => setNonVerified(response.data))
-    .catch((err)=>console.error("err getting verified",err))
-  }
+
 
   const verify = (id) => {
     axios
@@ -37,8 +33,13 @@ export default function _Dark_detailsbarberorsalonspecialist({route}) {
   };
 
   useEffect(() => {
+    const getAllNonVerifiedAppointments = () =>{
+      axios.get(`http://${ADDRESS_IP}:3001/reservation/getAllNonVerfiedBarberReservations/${barberId}`)
+      .then((response) => setNonVerified(response.data))
+      .catch((err)=>console.error("err getting verified",err))
+    }
     getAllNonVerifiedAppointments()
-  }, [nonVerified]); 
+  }, [tracker]); 
 
   function formatDateTime(dateTimeString) {
     const options = {
@@ -58,16 +59,15 @@ export default function _Dark_detailsbarberorsalonspecialist({route}) {
     return `${date} at ${time}`;
   }
     return (
-        < ScrollView >
+        < ScrollView style={styles.container} >
         
 {nonVerified.map((el)=>{
   
   return(
     <View key={el.id} style={{justifyContent:"center",alignItems:"center",...styles.typeSendListComponentAccountList,marginTop: 120}}>
       
-      <Text >{el.userName}</Text>
-      
-      <Text>{formatDateTime(el.date)}</Text>
+      <Text style={{ color: 'white' }}>{el.userName}</Text>
+<Text style={{ color: 'white' }}>{formatDateTime(el.date)}</Text>
       <View style={{ flexDirection: 'column', marginTop: 20 }}>
       <TouchableOpacity onPress={()=>verify(el.id)}>
       <View style={styles.sizeSmallTypeFilledIconNoneComponentChips}>
@@ -93,21 +93,17 @@ export default function _Dark_detailsbarberorsalonspecialist({route}) {
 }
 
 const styles = StyleSheet.create({
-
-  
+  container: {
+    flex: 1,
+    backgroundColor: 'rgba(24, 26, 32, 1)',
+    padding: 20, 
+    
+  },
  
-  	
-  
-  	
- 
- 
-  
-  
-
-
 
 typeSendListComponentAccountList: {
   flexShrink: 0,
+  
   width: 380,
   flexDirection: "row",
   alignItems: "center",

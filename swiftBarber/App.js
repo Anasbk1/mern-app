@@ -6,7 +6,6 @@ import { createStackNavigator, DefaultTheme } from "@react-navigation/stack";
 import Login from './screens/Login.js';
 import Signup from './screens/Signup.js';
 import Home from './screens/Home.js';
-import Profile from './screens/Profile.js';
 import Saved from './screens/Saved.js';
 import RemoveSaved from './screens/RemoveSaved.js';
 import { MyProvider } from './useContext/useContext.js';
@@ -21,6 +20,8 @@ import Privacy from './screens/barber/Privacy&Policy.js'
 import Notification from './screens/barber/Notification.js'
 import Schedule from './screens/barber/Schedule.js'
 import Gallery from './screens/barber/Gallery.js';
+import Explore from './screens/Explore.js'
+import MySchedule from './screens/MySchedule.js'
 
 const Stack = createStackNavigator()
 
@@ -37,7 +38,7 @@ export default function App() {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Signup" component={Signup} />
       <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Profile" component={Profile} />
+    
       <Stack.Screen name="Saved" component={Saved} />
       <Stack.Screen name ="RemoveSaved" component={RemoveSaved}/>
       <Stack.Screen name = "BarberDetail" component={BarberDetail}/>
@@ -50,6 +51,9 @@ export default function App() {
       <Stack.Screen name = 'Notification' component={Notification} />
       <Stack.Screen name = 'Schedule' component={Schedule} />
       <Stack.Screen name = 'Gallery' component={Gallery} />
+      <Stack.Screen name = 'Explore' component={Explore} />
+      <Stack.Screen name = 'MySchedule' component={MySchedule} />
+
     </Stack.Navigator>
   </NavigationContainer>
   </MyProvider>

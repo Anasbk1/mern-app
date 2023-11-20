@@ -54,7 +54,7 @@ export default function _Dark_profilesettings({route}) {
       navigation.navigate('EditProfile');
 
   };
-  console.log("verified",nonVerified)
+  console.log("verified",verified)
     return (
       <ScrollView>
       <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>

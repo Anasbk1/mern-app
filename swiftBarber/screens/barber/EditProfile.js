@@ -375,8 +375,11 @@ const handleEditDescriptionPress = () => {
           <View key={serviceName} style={styles.iconlyBoldTickSquare}>
             {editMode ? (
               <TextInput
+              placeholder='set services'
+              placeholderTextColor='white'
               style={{ color: 'gray' }}
                 value={services[serviceName]}
+
                 onChangeText={(newValue) =>
                   handleServiceChange(serviceName, newValue)
                 }
@@ -419,6 +422,8 @@ const handleEditDescriptionPress = () => {
 </TouchableOpacity>
 {editingDescription ? (
         <TextInput
+        placeholder='set description'
+        placeholderTextColor='gray'
           value={description}
           onChangeText={handleChangeDescriptionText}
           onBlur={handleEditDescriptionPress}

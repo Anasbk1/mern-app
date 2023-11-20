@@ -1,64 +1,68 @@
-import React,{useEffect,useState} from 'react';
-import { View, Text, StyleSheet,ScrollView } from 'react-native';
-import { Svg, Path, Line, Circle, Defs, Pattern, Use, Image } from 'react-native-svg';
+import React ,{useState,useEffect}from 'react';
+import { View, Text, StyleSheet,ScrollView ,Image} from 'react-native';
+import { Svg, Path, Line, Circle, Defs, Pattern, Use,  } from 'react-native-svg';
+import { dataStore } from '../store.js';
 import axios from 'axios';
-import ADDRESS_IP from '../API';
-export default function _Dark_detailsbarberorsalonspecialist({route}) {
+import ADDRESS_IP from './API.js';
 
-  const verified = route.params.verified;
-  const [copy,setCopy]=useState([])
-  const [data,setData]=useState([])
-  useEffect(()=>{
-    if (verified.length > 0) {
-      setCopy(verified)
-    }
+export default function _Dark_detailsbarberorsalonspecialist() {
+    const [reservation, setReservation] = useState([]);
+    const { userId } = dataStore();
+    const [barber, setBarber] = useState([]);
+    const [data,setData]=useState()
+   const [tracker,setTracker]=useState(false);
+    
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://${ADDRESS_IP}:3001/reservation/getAllVerfiedBarberReservations/${verified[0].barberId}`);
+        const response = await axios.get(`http://${ADDRESS_IP}:3001/reservation/allUserReservations/${userId}`);
         const reservations = response.data;
-      console.log(reservations);
+        setReservation(reservations);
+
         // Fetch barber data for each reservation
-        const userData = await Promise.all(
-          reservations.map((reservationItem) => axios.get(`http://${ADDRESS_IP}:3001/users/id/${reservationItem.userId}`))
+        const barberData = await Promise.all(
+          reservations.map((reservationItem) => axios.get(`http://${ADDRESS_IP}:3001/barbers/id/${reservationItem.barberId}`))
         );
-        console.log(userData);
+
         // Extract barber details from the responses
-        const users = userData.map((response) => response.data[0]);
-        console.log(users);
+        const barbers = barberData.map((response) => response.data[0]);
+        setBarber(barbers);
+
         // Combine reservation and barber data
         const reservationsWithBarbers = reservations.map((reservationItem, index) => ({
           ...reservationItem,
-          users: users[index],
+          barber: barbers[index],
         }));
 
         // Set the final data state
         setData(reservationsWithBarbers);
+        console.log('data',data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-    fetchData()
-  },[])
 
-  console.log( "copy",data)
+    fetchData(); // Call the fetchData function
 
-  function formatDateTime(dateTimeString) {
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    };
-    const date = new Date(dateTimeString).toLocaleDateString('en-US', options);
-
-    const timeOptions = {
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true,
-    };
-    const time = new Date(dateTimeString).toLocaleTimeString('en-US', timeOptions);
-
-    return `${date} at ${time}`;
-  }
+  }, []); 
+  
+    function formatDateTime(dateTimeString) {
+      const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      };
+      const date = new Date(dateTimeString).toLocaleDateString('en-US', options);
+  
+      const timeOptions = {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+      };
+      const time = new Date(dateTimeString).toLocaleTimeString('en-US', timeOptions);
+  
+      return `${date} at ${time}`;
+    }
     return (
       <ScrollView>
       <View style={{flex:1,justifyContent:"center",alignItems:"center"}}>
@@ -66,69 +70,70 @@ export default function _Dark_detailsbarberorsalonspecialist({route}) {
       			<View style={styles.group24}>
         				{/* RN-Flow:: can be replaced with <Bottombar activeMenu={"darkProfile"} component={"bottomBar"} /> */}
         				<View style={styles.bottombar}>
-          					<View style={styles.autoLayoutHorizontal}>
-            						<View style={styles.autoLayoutVertical}>
-              							{/* RN-Flow:: can be replaced with <IconlyLightHome  /> */}
-              							<View style={styles.iconlyLightHome}>
+                        <View style={styles.autoLayoutHorizontal}>
+<View style={styles.autoLayoutVertical}>
+{/* Vigma RN:: can be replaced with <IconlyLightHome /> */}
+<View style={styles.iconlyLightHome}>
 <Svg style={styles.group} width="22" height="22" viewBox="0 0 22 22" fill="none" >
-<Path d="M7.95726 19.7714V16.7047C7.95725 15.9246 8.59317 15.2908 9.38106 15.2856H12.2671C13.0588 15.2856 13.7006 15.9209 13.7006 16.7047V16.7047V19.7809C13.7004 20.4432 14.2343 20.9845 14.9031 21H16.8271C18.7452 21 20.3 19.4607 20.3 17.5618V17.5618V8.83784C20.2898 8.09083 19.9355 7.38935 19.338 6.93303L12.7578 1.6853C11.605 0.771566 9.96625 0.771566 8.81347 1.6853L2.26207 6.94256C1.66231 7.39702 1.30744 8.09967 1.30005 8.84736V17.5618C1.30005 19.4607 2.85492 21 4.77296 21H6.69701C7.3824 21 7.93802 20.4499 7.93802 19.7714V19.7714" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<Path d="M7.958 19.7714V16.7047C7.95798 15.9246 8.5939 15.2908 9.38179 15.2856H12.2679C13.0595 15.2856 13.7013 15.9209 13.7013 16.7047V16.7047V19.7809C13.7011 20.4432 14.235 20.9845 14.9038 21H16.8279C18.7459 21 20.3008 19.4607 20.3008 17.5618V17.5618V8.83784C20.2905 8.09083 19.9363 7.38935 19.3388 6.93303L12.7585 1.6853C11.6057 0.771566 9.96699 0.771566 8.8142 1.6853L2.26281 6.94256C1.66304 7.39702 1.30817 8.09967 1.30078 8.84736V17.5618C1.30078 19.4607 2.85566 21 4.77369 21H6.69774C7.38314 21 7.93876 20.4499 7.93876 19.7714V19.7714" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 </Svg>
-
-              							</View>
-              							<Text style={styles.home}>
-                								{`Home`}
-              							</Text>
-            						</View>
-            						<View style={styles._autoLayoutVertical}>
-              							{/* RN-Flow:: can be replaced with <IconlyLightLocation  /> */}
-              							<View style={styles.iconlyLightLocation}/>
-              							<Text style={styles.explore}>
-                								{`notification`}
-              							</Text>
-            						</View>
-            						<View style={styles.__autoLayoutVertical}>
-              							{/* RN-Flow:: can be replaced with <IconlyLightDocument  /> */}
-              							<View style={styles.iconlyLightDocument}>
-<Svg style={styles.document} width="19" height="20" viewBox="0 0 19 20" fill="none" >
-<Path d="M12.7162 14.2234H5.49622" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M12.7162 10.0369H5.49622" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M8.25134 5.86011H5.49634" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path fillRule="evenodd" clipRule="evenodd" d="M12.9086 0.749817C12.9086 0.749817 5.23161 0.753817 5.21961 0.753817C2.45961 0.770817 0.75061 2.58682 0.75061 5.35682V14.5528C0.75061 17.3368 2.47261 19.1598 5.25661 19.1598C5.25661 19.1598 12.9326 19.1568 12.9456 19.1568C15.7056 19.1398 17.4156 17.3228 17.4156 14.5528V5.35682C17.4156 2.57282 15.6926 0.749817 12.9086 0.749817Z" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-</Svg>
-
-              							</View>
-              							<Text style={styles.myBooking}>
-                								{`My schedule`}
-              							</Text>
-            						</View>
-            						<View style={styles.___autoLayoutVertical}>
-              							{/* RN-Flow:: can be replaced with <IconlyLightChat  /> */}
-              							<View style={styles.iconlyLightChat}>
-<Svg style={styles.chat} width="23" height="22" viewBox="0 0 23 22" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M18.6715 18.0699C15.6153 21.1263 11.0899 21.7867 7.38651 20.074C6.8398 19.8539 6.39158 19.676 5.96547 19.676C4.77859 19.683 3.30126 20.8339 2.53346 20.067C1.76565 19.2991 2.91736 17.8206 2.91736 16.6266C2.91736 16.2004 2.74651 15.7602 2.52642 15.2124C0.812928 11.5096 1.47421 6.98269 4.53036 3.92721C8.4317 0.0244319 14.7701 0.0244322 18.6715 3.9262C22.5798 7.83501 22.5728 14.1681 18.6715 18.0699Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M15.5394 11.413H15.5484" stroke="#9E9E9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M11.5305 11.413H11.5395" stroke="#9E9E9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M7.5215 11.413H7.5305" stroke="#9E9E9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-</Svg>
-
-              							</View>
-              							<Text style={styles.inbox}>
-                								{`Inbox`}
-              							</Text>
-            						</View>
-            						<View style={styles.____autoLayoutVertical}>
-              							{/* RN-Flow:: can be replaced with <IconlyBoldProfile  /> */}
-              							<View style={styles.iconlyBoldProfile}>
+</View>
+<Text style={styles.home}>
+{`Home`}
+</Text>
+</View>
+<View style={styles._autoLayoutVertical}>
+{/* Vigma RN:: can be replaced with <IconlyLightLocation /> */}
+<View style={styles.iconlyLightLocation}>
 <Svg style={styles._group} width="17" height="20" viewBox="0 0 17 20" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M13.4941 5.29105C13.4941 8.22808 11.1392 10.5831 8.20007 10.5831C5.26197 10.5831 2.90609 8.22808 2.90609 5.29105C2.90609 2.35402 5.26197 0 8.20007 0C11.1392 0 13.4941 2.35402 13.4941 5.29105ZM8.20007 20C3.86245 20 0.200073 19.295 0.200073 16.575C0.200073 13.8539 3.88546 13.1739 8.20007 13.1739C12.5387 13.1739 16.2001 13.8789 16.2001 16.599C16.2001 19.32 12.5147 20 8.20007 20Z" fill="#9E9E9E"/>
+<Path fillRule="evenodd" clipRule="evenodd" d="M10.9004 8.50051C10.9004 7.11924 9.78115 6 8.4009 6C7.01963 6 5.90039 7.11924 5.90039 8.50051C5.90039 9.88076 7.01963 11 8.4009 11C9.78115 11 10.9004 9.88076 10.9004 8.50051Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<Path fillRule="evenodd" clipRule="evenodd" d="M8.3999 19C7.20143 19 0.900391 13.8984 0.900391 8.56329C0.900391 4.38664 4.25749 1 8.3999 1C12.5423 1 15.9004 4.38664 15.9004 8.56329C15.9004 13.8984 9.59838 19 8.3999 19Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 </Svg>
-
-              							</View>
-              							<Text style={styles.profile}>
-                								{`Profile`}
-              							</Text>
-            						</View>
-          					</View>
+</View>
+<Text style={styles.explore}>
+{`Explore`}
+</Text>
+</View>
+<View style={styles.__autoLayoutVertical}>
+{/* Vigma RN:: can be replaced with <IconlyLightDocument /> */}
+<View style={styles.iconlyLightDocument}>
+<Svg style={styles.__group} width="19" height="20" viewBox="0 0 19 20" fill="none" >
+<Path d="M12.7161 14.2236H5.49609" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<Path d="M12.7161 10.0371H5.49609" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<Path d="M8.25109 5.86035H5.49609" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<Path fillRule="evenodd" clipRule="evenodd" d="M12.908 0.75C12.908 0.75 5.231 0.754 5.219 0.754C2.459 0.771 0.75 2.587 0.75 5.357V14.553C0.75 17.337 2.472 19.16 5.256 19.16C5.256 19.16 12.932 19.157 12.945 19.157C15.705 19.14 17.415 17.323 17.415 14.553V5.357C17.415 2.573 15.692 0.75 12.908 0.75Z" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+</Svg>
+</View>
+<Text style={styles.myBooking}>
+{`My Booking`}
+</Text>
+</View>
+<View style={styles.___autoLayoutVertical}>
+{/* Vigma RN:: can be replaced with <IconlyLightChat /> */}
+<View style={styles.iconlyLightChat}>
+<Svg style={styles.___group} width="23" height="22" viewBox="0 0 23 22" fill="none" >
+<Path fillRule="evenodd" clipRule="evenodd" d="M18.6729 18.0699C15.6168 21.1263 11.0913 21.7867 7.38798 20.074C6.84127 19.8539 6.39305 19.676 5.96693 19.676C4.78005 19.683 3.30273 20.8339 2.53492 20.067C1.76712 19.2991 2.91883 17.8206 2.91883 16.6266C2.91883 16.2004 2.74798 15.7602 2.52789 15.2124C0.814393 11.5096 1.47567 6.98269 4.53182 3.92721C8.43316 0.0244319 14.7716 0.0244322 18.6729 3.9262C22.5813 7.83501 22.5743 14.1681 18.6729 18.0699Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<Path d="M15.5404 11.4131H15.5494" stroke="#9E9E9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+<Path d="M11.5326 11.4131H11.5416" stroke="#9E9E9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+<Path d="M7.52284 11.4131H7.53184" stroke="#9E9E9E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+</Svg>
+</View>
+<Text style={styles.inbox}>
+{`Inbox`}
+</Text>
+</View>
+<View style={styles.____autoLayoutVertical}>
+{/* Vigma RN:: can be replaced with <IconlyBoldProfile /> */}
+<View style={styles.iconlyBoldProfile}>
+<Svg style={styles.____group} width="17" height="20" viewBox="0 0 17 20" fill="none" >
+<Path fillRule="evenodd" clipRule="evenodd" d="M13.4952 5.29105C13.4952 8.22808 11.1403 10.5831 8.20117 10.5831C5.26307 10.5831 2.90719 8.22808 2.90719 5.29105C2.90719 2.35402 5.26307 0 8.20117 0C11.1403 0 13.4952 2.35402 13.4952 5.29105ZM8.20117 20C3.86355 20 0.201172 19.295 0.201172 16.575C0.201172 13.8539 3.88655 13.1739 8.20117 13.1739C12.5398 13.1739 16.2012 13.8789 16.2012 16.599C16.2012 19.32 12.5158 20 8.20117 20Z" fill="#9E9E9E"/>
+</Svg>
+</View>
+<Text style={styles.profile}>
+{`Profile`}
+</Text>
+</View>
+</View>
           					{/* RN-Flow:: can be replaced with <HomeIndicator  /> */}
           					<View style={styles.homeIndicator}>
 <Svg style={styles.vector} width="134" height="5" viewBox="0 0 134 5" fill="none" >
@@ -138,13 +143,7 @@ export default function _Dark_detailsbarberorsalonspecialist({route}) {
           					</View>
         				</View>
         				{/* RN-Flow:: can be replaced with <IconlyLightNotification  /> */}
-        				<View style={styles.iconlyLightNotification}>
-<Svg style={styles.notification} width="20" height="22" viewBox="0 0 20 22" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M10 16.8476C15.6392 16.8476 18.2481 16.1242 18.5 13.2205C18.5 10.3188 16.6812 10.5054 16.6812 6.94511C16.6812 4.16414 14.0452 1 10 1C5.95477 1 3.31885 4.16414 3.31885 6.94511C3.31885 10.5054 1.5 10.3188 1.5 13.2205C1.75295 16.1352 4.36177 16.8476 10 16.8476Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M12.3887 19.8572C11.0246 21.372 8.89659 21.3899 7.51941 19.8572" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-</Svg>
-
-        				</View>
+        				
       			</View>
       			{/* RN-Flow:: can be replaced with <ThemeDarkDivider theme={"darkDivider"} /> */}
       			<View style={styles.themeDarkDivider}>
@@ -158,19 +157,27 @@ export default function _Dark_detailsbarberorsalonspecialist({route}) {
         				<View style={styles.typeSendListComponentAccountList}>
           					<View style={styles.__autoLayoutVertical}>
             						{/* RN-Flow:: can be replaced with <TypeDefaultComponentAvatar type={"default"} component={"avatar"} /> */}
-            				
-                        {verified.map((el)=>{
-                          return(
-                            <View style={styles}>
-              							<Text style={styles.name}>
-                								{el.userName}
-              							</Text>
-              							<Text style={styles.information}>
-                								{`is coming at :${formatDateTime(el.date)}`}
-              							</Text>
-            						</View>
-                          )
-                        })}
+                                    <View style={styles.autoLayoutHorizontal}>
+                                    {data &&
+  data
+    .filter((el) => el.verified === true)
+    .map((el) => (
+      <View style={styles.container} key={el.id}>
+        <Image
+          style={styles.typeDefaultComponentAvatar}
+          source={{ uri: el.barber.image }}
+          onError={() => console.log('Image failed to load')}
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.name}>{el.userName}</Text>
+          <Text style={styles.information}>{`you have a rendez-vous with ${el.barber.name}: ${formatDateTime(
+            el.date
+          )}`}</Text>
+        </View>
+        <View style={styles.space} /> 
+      </View>
+    ))}
+</View>
             					
           					</View>
         				</View>
@@ -201,7 +208,9 @@ export default function _Dark_detailsbarberorsalonspecialist({route}) {
     )
 }
 
+
 const styles = StyleSheet.create({
+
   	_Dark_detailsbarberorsalonspecialist: {
     flexShrink: 0,
     height: 926,
@@ -210,6 +219,18 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     rowGap: 0
 },
+container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  typeDefaultComponentAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+
   	group24: {
     position: "absolute",
     flexShrink: 0,
@@ -270,7 +291,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    
     fontSize: 10,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224
@@ -294,7 +315,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+    
     fontSize: 10,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224
@@ -326,7 +347,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(251, 148, 0, 1)",
-    fontFamily: "Urbanist",
+    
     fontSize: 10,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224
@@ -358,7 +379,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+
     fontSize: 10,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224
@@ -390,7 +411,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "center",
     color: "rgba(158, 158, 158, 1)",
-    fontFamily: "Urbanist",
+   
     fontSize: 10,
     fontWeight: "700",
     letterSpacing: 0.20000000298023224
@@ -411,24 +432,8 @@ const styles = StyleSheet.create({
     height: 5,
     overflow: "visible"
 },
-  	iconlyLightNotification: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 12,
-    height: 24,
-    left: 122,
-    width: 24,
-    alignItems: "flex-start",
-    rowGap: 0
-},
-  	notification: {
-    position: "absolute",
-    flexShrink: 0,
-    top: 2,
-    height: 20,
-    left: 4,
-    width: 17
-},
+  	
+  
   	themeDarkDivider: {
     position: "absolute",
     flexShrink: 0,
@@ -474,19 +479,21 @@ const styles = StyleSheet.create({
 },
   	typeDefaultComponentAvatar: {
     flexShrink: 0,
-    height: 60,
-    width: 60,
+    height: 80,
+    width: 80,
     alignItems: "flex-start",
-    rowGap: 0
+    rowGap: 0,
+    borderRadius:37,
 },
-  	ellipse: {
+ellipse: {
     position: "absolute",
-    flexShrink: 0,
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
-    overflow: "visible"
+    overflow: "hidden",
+    borderRadius: 100 ,
+
 },
   	_____autoLayoutVertical: {
     flexGrow: 1,
@@ -500,7 +507,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+   
     fontSize: 18,
     fontWeight: "700",
     letterSpacing: 0,
@@ -511,7 +518,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "left",
     color: "rgba(224, 224, 224, 1)",
-    fontFamily: "Urbanist",
+  
     fontSize: 14,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224,
@@ -582,7 +589,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+   
     fontSize: 18,
     fontWeight: "700",
     letterSpacing: 0,
@@ -593,7 +600,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     textAlign: "left",
     color: "rgba(224, 224, 224, 1)",
-    fontFamily: "Urbanist",
+  
     fontSize: 14,
     fontWeight: "500",
     letterSpacing: 0.20000000298023224,
@@ -641,7 +648,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     textAlign: "left",
     color: "rgba(255, 255, 255, 1)",
-    fontFamily: "Urbanist",
+
     fontSize: 24,
     fontWeight: "700",
     letterSpacing: 0,

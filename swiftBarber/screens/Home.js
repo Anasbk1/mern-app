@@ -9,7 +9,7 @@ import ADDRESS_IP from './API.js';
 import { dataStore } from '../store.js';
 import { MyContext } from '../useContext/useContext.js';
 import * as Location from 'expo-location'
-import Icon  from 'react-native-vector-icons/MaterialIcons'
+
 import { FIREBASE_AUTH } from "../Firebase/index";
 export default function _Dark_homefullpage({ route }) {
   const {setUserId,userMail,setUserMail}= dataStore()
@@ -23,6 +23,8 @@ export default function _Dark_homefullpage({ route }) {
   const [barbersData, setSelectedBarbersData] = useState([]);
   const [position , setPosition] = useState({})
   const [searched,setSearched]=useState("")
+  const [filteredData, setFilteredData] = useState([]);
+  const [serviceType, setServiceType] = useState("all");
   // Function to toggle the bookmark style
   const toggleBookmark = (barberId) => {
     setSelectedBarbers((prevSelectedBarbers) => ({
@@ -31,12 +33,13 @@ export default function _Dark_homefullpage({ route }) {
     }));
   }
   const search = (e) => {
-    const filteredData = barbersData.filter((data) => data.includes(e));
-    // Do something with the filteredData, for example, log it or update state
-    console.log(filteredData);
-    // If you want to use the filteredData in some way, return it
-    return filteredData;
-  }
+    setSearched(e);
+    const filtered = filteredData.filter((data) =>
+      data.name.toLowerCase().includes(e.toLowerCase())
+    );
+    setFilteredData(filtered);
+  };
+
   const logOut = async () => {
     try {
       await signOut(FIREBASE_AUTH);
@@ -76,7 +79,8 @@ export default function _Dark_homefullpage({ route }) {
       .then(response => response.json())
       .then(data => {
         setBarbers(data);
-        console.log(barbers[0].location);
+        setFilteredData(data);
+       
         
       })
       .catch(error => console.log(error));
@@ -119,6 +123,9 @@ export default function _Dark_homefullpage({ route }) {
 // Call getUserLocation when the component mounts
 useEffect(() => {
     getUserLocation();
+  
+      
+  
 }, []);
 
 
@@ -138,8 +145,17 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
 }
 
 
+const filterByServiceType = (type) => {
+  setServiceType(type);
+  const filtered = barbers.filter((barber) => {
+    const service = barber.service;
 
- 
+    // Check if service is not null and has the specified type
+    return type === "all" || (service && service.hasOwnProperty(type));
+  });
+  console.log('filtered',filtered);
+  setFilteredData(filtered);  // Update the state with the filtered data
+};
 
  
     return (
@@ -178,13 +194,13 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
               							</View>
               							{/* RN-Flow:: can be replaced with <IconlyCurvedBookmark  /> */}
               							<View style={styles.iconlyCurvedBookmark}>
-                            <TouchableOpacity onPress={()=>navigation.navigate('Saved',{ barbersData })}>
+                            <TouchableOpacity onPress={()=>navigation.navigate('Saved',{ barbersData,getUserLocation,calculateDistance,position })}>
       <Svg style={styles._group} width="20" height="24" viewBox="0 0 20 24" fill="none">
         <Path d="M5.9668 8.75399H13.9643" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         <Path fillRule="evenodd" clipRule="evenodd" d="M9.96528 0.916626C2.51378 0.916626 1.25495 2.00396 1.25495 10.7505C1.25495 20.5423 1.07178 23.0833 2.93378 23.0833C4.79462 23.0833 7.83378 18.7853 9.96528 18.7853C12.0968 18.7853 15.1359 23.0833 16.9968 23.0833C18.8588 23.0833 18.6756 20.5423 18.6756 10.7505C18.6756 2.00396 17.4168 0.916626 9.96528 0.916626Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </Svg>
     </TouchableOpacity>
-    <TouchableOpacity onPress={()=>logOut()}><Icon name='logout' size={30} color="white"/></TouchableOpacity>
+    {/* <TouchableOpacity onPress={()=>logOut()}><Icon name='logout' size={30} color="white"/></TouchableOpacity> */}
               							</View>
             						</View>
           					</View>
@@ -203,16 +219,14 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
             						</View>
                      
             						{/* RN-Flow:: can be replaced with <IconlyLightFilter  /> */}
-            						<View style={styles.iconlyLightFilter}>
-<Svg style={styles.___group} width="16" height="14" viewBox="0 0 16 14" fill="none" >
-<Path d="M6.60997 10.8274H1.35938" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M8.95117 2.75035H14.2018" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path fillRule="evenodd" clipRule="evenodd" d="M5.27256 2.70521C5.27256 1.6255 4.39076 0.75 3.30327 0.75C2.21578 0.75 1.33398 1.6255 1.33398 2.70521C1.33398 3.78492 2.21578 4.66042 3.30327 4.66042C4.39076 4.66042 5.27256 3.78492 5.27256 2.70521Z" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path fillRule="evenodd" clipRule="evenodd" d="M14.6671 10.7948C14.6671 9.7151 13.786 8.8396 12.6985 8.8396C11.6103 8.8396 10.7285 9.7151 10.7285 10.7948C10.7285 11.8745 11.6103 12.75 12.6985 12.75C13.786 12.75 14.6671 11.8745 14.6671 10.7948Z" stroke="#FB9400" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-</Svg>
-<TextInput defaultValue='Search' value='Search' onChangeText={(e)=>{search(e)
-                        setSearched(e)}} style={{width:800,top:0,left:50,position:'absolute'}}/>
-            						</View>
+    
+                        <TextInput
+      value={searched}
+      placeholder="Search"
+      onChangeText={(e) => search(e)}
+      style={{ width: 200, height: 40, borderColor: 'gray', }}
+    />
+            						
           					</View>
           			
           					<View style={styles.____autoLayoutHorizontal}>  
@@ -338,40 +352,55 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
               							{`See All`}
             						</Text>
           					</View>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           					<View style={styles.__________autoLayoutHorizontal}>
             						{/* RN-Flow:: can be replaced with <SizeMediumTypeFilledIconNoneComponentChips size={"medium"} type={"filled"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.sizeMediumTypeFilledIconNoneComponentChips}>
-              							<Text style={styles.chips}>
-                								{`All`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <SizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles._chips}>
-                								{`Haircuts`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <_sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles._sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles.__chips}>
-                								{`Make up`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <__sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.__sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles.___chips}>
-                								{`Manicure`}
-              							</Text>
-            						</View>
-            						{/* RN-Flow:: can be replaced with <___sizeMediumTypeBorderIconNoneComponentChips size={"medium"} type={"border"} icon={"none"} component={"chips"} /> */}
-            						<View style={styles.___sizeMediumTypeBorderIconNoneComponentChips}>
-              							<Text style={styles.____chips}>
-                								{`Massage`}
-              							</Text>
-            						</View>
-          					</View>
-                    {barbers.map((barber) => (
-                      
+                        
+                        <View style={styles.sizeMediumTypeFilledIconNoneComponentChips}>
+  <TouchableOpacity onPress={() => filterByServiceType("all")}>
+    <Text style={styles.chips}>
+      {`All`}
+    </Text>
+  </TouchableOpacity>
+</View>
+
+<View style={styles.sizeMediumTypeBorderIconNoneComponentChips}>
+  <TouchableOpacity onPress={() => filterByServiceType("haircut")}>
+    <Text style={styles._chips}>
+      {`Haircuts`}
+    </Text>
+  </TouchableOpacity>
+</View>
+
+<View style={styles._sizeMediumTypeBorderIconNoneComponentChips}>
+  <TouchableOpacity onPress={() => filterByServiceType("makeUp")}>
+    <Text style={styles.__chips}>
+      {`Make up`}
+    </Text>
+  </TouchableOpacity>
+</View>
+
+<View style={styles.__sizeMediumTypeBorderIconNoneComponentChips}>
+  <TouchableOpacity onPress={() => filterByServiceType("manicure")}>
+    <Text style={styles.___chips}>
+      {`Manicure`}
+    </Text>
+  </TouchableOpacity>
+
+</View>
+
+
+<View style={styles.___sizeMediumTypeBorderIconNoneComponentChips}>
+  <TouchableOpacity onPress={() => filterByServiceType("massage")}>
+    <Text style={styles.____chips}>
+      {`Massage`}
+    </Text>
+  </TouchableOpacity>
+</View>
+</View>
+</ScrollView>
+
+                    {filteredData.map((barber) => (
       <View style={styles.themeDarkComponentBarberandSalonList} key={barber.id}>
         <View style={styles.maskGroup}>  
         <View style={styles.mask} />
@@ -438,28 +467,30 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
           					</View>
           					<View style={styles.__________________autoLayoutVertical}>
             						{/* RN-Flow:: can be replaced with <IconlyLightLocation  /> */}
-            						<View style={styles.iconlyLightLocation}>
-<Svg style={styles.________________________group} width="17" height="20" viewBox="0 0 17 20" fill="none" >
-<Path fillRule="evenodd" clipRule="evenodd" d="M10.9004 8.50051C10.9004 7.11924 9.78115 6 8.4009 6C7.01963 6 5.90039 7.11924 5.90039 8.50051C5.90039 9.88076 7.01963 11 8.4009 11C9.78115 11 10.9004 9.88076 10.9004 8.50051Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path fillRule="evenodd" clipRule="evenodd" d="M8.3999 19C7.20143 19 0.900391 13.8984 0.900391 8.56329C0.900391 4.38664 4.25749 1 8.3999 1C12.5423 1 15.9004 4.38664 15.9004 8.56329C15.9004 13.8984 9.59838 19 8.3999 19Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-</Svg>
-
-            						</View>
+            					  <TouchableOpacity onPress={()=> navigation.navigate('Explore')}>
+      <View style={styles.iconlyLightLocation}>
+        <Svg style={styles.________________________group} width="17" height="20" viewBox="0 0 17 20" fill="none">
+          <Path fillRule="evenodd" clipRule="evenodd" d="M10.9004 8.50051C10.9004 7.11924 9.78115 6 8.4009 6C7.01963 6 5.90039 7.11924 5.90039 8.50051C5.90039 9.88076 7.01963 11 8.4009 11C9.78115 11 10.9004 9.88076 10.9004 8.50051Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <Path fillRule="evenodd" clipRule="evenodd" d="M8.3999 19C7.20143 19 0.900391 13.8984 0.900391 8.56329C0.900391 4.38664 4.25749 1 8.3999 1C12.5423 1 15.9004 4.38664 15.9004 8.56329C15.9004 13.8984 9.59838 19 8.3999 19Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
+      </View>
+    </TouchableOpacity>
             						<Text style={styles.explore}>
               							{`Explore`}
             						</Text>
           					</View>
           					<View style={styles.___________________autoLayoutVertical}>
             						{/* RN-Flow:: can be replaced with <IconlyLightDocument  /> */}
-            						<View style={styles.iconlyLightDocument}>
-<Svg style={styles._________________________group} width="19" height="20" viewBox="0 0 19 20" fill="none" >
-<Path d="M12.7161 14.2234H5.49609" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M12.7161 10.0369H5.49609" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path d="M8.25109 5.86011H5.49609" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-<Path fillRule="evenodd" clipRule="evenodd" d="M12.908 0.749756C12.908 0.749756 5.231 0.753756 5.219 0.753756C2.459 0.770756 0.75 2.58676 0.75 5.35676V14.5528C0.75 17.3368 2.472 19.1598 5.256 19.1598C5.256 19.1598 12.932 19.1568 12.945 19.1568C15.705 19.1398 17.415 17.3228 17.415 14.5528V5.35676C17.415 2.57276 15.692 0.749756 12.908 0.749756Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-</Svg>
-
-            						</View>
+                        <TouchableOpacity onPress={()=> navigation.navigate('MySchedule')}>
+      <View style={styles.iconlyLightDocument}>
+        <Svg style={styles._________________________group} width="19" height="20" viewBox="0 0 19 20" fill="none">
+          <Path d="M12.7161 14.2234H5.49609" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M12.7161 10.0369H5.49609" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <Path d="M8.25109 5.86011H5.49609" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <Path fillRule="evenodd" clipRule="evenodd" d="M12.908 0.749756C12.908 0.749756 5.231 0.753756 5.219 0.753756C2.459 0.770756 0.75 2.58676 0.75 5.35676V14.5528C0.75 17.3368 2.472 19.1598 5.256 19.1598C5.256 19.1598 12.932 19.1568 12.945 19.1568C15.705 19.1398 17.415 17.3228 17.415 14.5528V5.35676C17.415 2.57276 15.692 0.749756 12.908 0.749756Z" stroke="#9E9E9E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </Svg>
+      </View>
+    </TouchableOpacity>
             						<Text style={styles.myBooking}>
               							{`My Booking`}
             						</Text>
